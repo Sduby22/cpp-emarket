@@ -13,8 +13,16 @@ include_directories(./include)
 add_subdirectory(src)
 add_library(sockpp STATIC $<TARGET_OBJECTS:sockpp-objs>)
 
-add_executable(client $<TARGET_OBJECTS:client-obj>)
-add_executable(server $<TARGET_OBJECTS:server-obj>)
+add_executable(client $<TARGET_OBJECTS:client-obj> $<TARGET_OBJECTS:datatype>)
+add_executable(server $<TARGET_OBJECTS:server-obj> $<TARGET_OBJECTS:datatype>)
 
 target_link_libraries(client sockpp)
 target_link_libraries(server sockpp Threads::Threads)
+
+configure_file(test.sh test.sh)
+
+add_custom_target(
+	test
+	COMMAND ./test.sh
+	DEPENDS client server
+	)

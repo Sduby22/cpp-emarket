@@ -1,5 +1,10 @@
+#ifndef DATA_TYPE_H_WXRDIQC3
+#define DATA_TYPE_H_WXRDIQC3
+
+
 #include <string>
 #include <utility>
+#include "sockpp/stream_socket.h"
 
 namespace data_type {
 
@@ -13,12 +18,41 @@ enum class REQUEST_TYPE { LOGIN, SIGNUP, PASSWD, LIST, ADD_TO_CART, CART_CHECKOU
 using id_type = unsigned int;
 
 struct base_data {
-  virtual void send() = 0;
-  virtual void recv() = 0;
-  virtual ~base_data();
+  virtual ssize_t send(sockpp::stream_socket &socket) const = 0;
+  virtual ssize_t recv(sockpp::stream_socket &socket) = 0;
+
+  template<typename T>
+  static ssize_t write(sockpp::stream_socket &sock, const T& buf);
+  
+  template<typename T>
+  static ssize_t read(sockpp::stream_socket &sock, T& buf);
+  
+  virtual std::string dump() const = 0;
+
+  virtual ~base_data() {};
 };
 
 struct request_data: base_data {
+  virtual ssize_t send(sockpp::stream_socket &socket) const;
+  virtual ssize_t recv(sockpp::stream_socket &socket);
+  virtual std::string dump() const;
+
+  request_data(REQUEST_TYPE type, id_type user_id, id_type target)
+    : type(type), user_id(user_id), target(target)
+  {}
+
+  request_data(REQUEST_TYPE type, std::string payload1, std::string payload2)
+    : type(type), payload1(payload1), payload2(payload2), user_id(0), target(0)
+  {}
+
+  request_data(REQUEST_TYPE type, id_type user_id, id_type target,
+               std::string payload1, std::string payload2)
+    : type(type), user_id(user_id), target(target), 
+      payload1(payload1), payload2(payload2)
+  {}
+
+  request_data() {}
+
   REQUEST_TYPE type;
   id_type user_id;
   id_type target;
@@ -28,13 +62,25 @@ struct request_data: base_data {
 
 
 struct response_data: base_data {
+  virtual ssize_t send(sockpp::stream_socket &socket) const;
+  virtual ssize_t recv(sockpp::stream_socket &socket);
+  virtual std::string dump() const;
+
+  response_data(int success, id_type user_id, std::string msg)
+    : success(success), user_id(user_id), msg(msg) {}
+
+  response_data(int success, std::string msg)
+    : success(success), msg(msg), user_id(0) {}
+
+  response_data() {}
+
   int success;
   id_type user_id;
   std::string msg;
 };
 
 
-struct user_data: base_data {
+struct user_data {
   id_type id;
   long long int balance; // Unit: 分
   USER_TYPE type;
@@ -43,7 +89,7 @@ struct user_data: base_data {
 };
 
 
-struct item_data: base_data {
+struct item_data {
   id_type id;
   id_type seller;
   size_t stock;
@@ -55,7 +101,7 @@ struct item_data: base_data {
 };
 
 
-struct order_data: base_data {
+struct order_data {
   id_type id;
   id_type item_id;
   id_type customer;
@@ -98,3 +144,6 @@ data_handler<request_data>::receive() {
 } */
 
 } // namespace data
+
+
+#endif /* end of include guard: DATA_TYPE_H_WXRDIQC3 */

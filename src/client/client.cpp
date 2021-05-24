@@ -1,4 +1,5 @@
 #include <iostream>
+#include <string>
 
 #include "client_session.h"
 
