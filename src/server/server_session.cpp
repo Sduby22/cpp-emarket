@@ -40,8 +40,8 @@ response_data session::exec(request_data &req) {
     case REQUEST_TYPE::WALLET_SHOW:
     case REQUEST_TYPE::WALLET_TOPUP:
     default:
-      resp.success = false;
-      resp.msg = "unknown error";
+      resp.success = true;
+      resp.msg = req.payload1;
       std::cout << req.dump() << std::endl;
   }
   return resp;

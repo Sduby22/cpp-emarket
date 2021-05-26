@@ -11,10 +11,14 @@
 
 namespace client {
 
+class client_session;
+
 class cli_session {
 public:
+  friend class client_session;
   cli_session(std::unique_ptr<cli::Menu> menu): cli(std::move(menu)), session(cli) {}
   void Start() { session.Start(); }
+  void Exit() { session.Exit(); }
 private:
   cli::Cli cli;
   cli::CliFileSession session;
@@ -28,18 +32,32 @@ public:
   data_type::response_data feed(const data_type::request_data &req);
   void Start() { session->Start(); }
   bool logged_in() const { return current_user!=0; };
-  void logout();
-  void login(std::string&);
-  void signup(std::string&);
 
 private:
   std::unique_ptr<cli::Menu> gen_main_menu();
-  /* using user_ptr = std::unique_ptr<my_user::base_user>;
-  user_ptr current_user; */
+  std::unique_ptr<cli::Menu> gen_user_menu();
   std::unique_ptr<cli_session> session;
   data_type::id_type current_user;
   unsigned port;
   std::string host;
+
+  void logout();
+  void login(std::string&);
+  void signup(std::string&);
+  void search(std::string&) const;
+  void list() const;
+  void passwd() const;
+  void add_to_cart(data_type::id_type) const;
+  void cart_checkout() const;
+  void cart_show() const;
+  void wallet_show() const;
+  void wallet_topup(double) const;
+  void orders_show() const;
+  void orders_cancel(data_type::id_type) const;
+  void orders_pay(data_type::id_type) const;
+  void seller_list() const;
+  void seller_edit(data_type::id_type) const;
+  void seller_add() const;
 };
 
 }

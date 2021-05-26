@@ -15,11 +15,11 @@ include_directories(./include)
 include(GNUInstallDirs)
 
 if(WIN32)
-	set(SQLite3_INCLUDE_DIRS ./sqlite3/include)
-	set(SQLite3_LIBRARY ./sqlite3/lib)
-	set(LIBS_SYSTEM ws2_32)
+  set(SQLite3_INCLUDE_DIRS ./sqlite3/include)
+  set(SQLite3_LIBRARY ./sqlite3/lib)
+  set(LIBS_SYSTEM ws2_32)
 elseif(UNIX)
-	set(LIBS_SYSTEM c stdc++)
+  set(LIBS_SYSTEM c stdc++)
 endif()
 
 find_package(SQLite3 REQUIRED)
@@ -32,12 +32,12 @@ add_executable(client $<TARGET_OBJECTS:client-obj> $<TARGET_OBJECTS:datatype>)
 add_executable(server $<TARGET_OBJECTS:server-obj> $<TARGET_OBJECTS:datatype>)
 
 target_link_libraries(client sockpp)
-target_link_libraries(server sockpp Threads::Threads)
+target_link_libraries(server sockpp Threads::Threads sqlite3)
 
 configure_file(test.sh test.sh)
 
 add_custom_target(
-	test
-	COMMAND ./test.sh
-	DEPENDS client server
-	)
+  test
+  COMMAND ./test.sh
+  DEPENDS client server
+)

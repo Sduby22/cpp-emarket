@@ -83,7 +83,7 @@ struct response_data: base_data {
 struct user_data {
   id_type id;
   long long int balance; // Unit: 分
-  USER_TYPE type;
+  int type;
   std::string name;
   std::string passwd;
 };
@@ -95,9 +95,10 @@ struct item_data {
   size_t stock;
   size_t frozen;
   float discount;
-  ITEM_TYPE type;
+  int type;
   long long int price;
   std::string description;
+  std::string name;
 };
 
 
