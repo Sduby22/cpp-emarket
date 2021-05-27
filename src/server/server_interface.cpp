@@ -85,4 +85,9 @@ namespace my_user {
     storage.sync_schema();
   }
 
+  bool base_user::exist(const std::string& name) {
+    auto match = storage.get_all<user_data>(where(c(&user_data::name) == name));
+    return !match.empty();
+  }
+
 }

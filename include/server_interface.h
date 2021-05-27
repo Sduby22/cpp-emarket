@@ -10,6 +10,7 @@ namespace my_user {
 
 class base_user {
 public:
+  static bool exist(const std::string& name);
   static std::unique_ptr<base_user> get(data_type::id_type id);
   using USER_TYPE = data_type::USER_TYPE;
   base_user(std::unique_ptr<data_type::user_data> &&ptr)

@@ -32,49 +32,49 @@ response_data session::exec(request_data &req) {
   std::cout << req.dump() << std::endl;
   switch (req.type) {
     case REQUEST_TYPE::ADD_TO_CART:
-      add_to_cart(req, vec);
+      resp = add_to_cart(req, vec);
       break;
     case REQUEST_TYPE::CART_CHECKOUT:
-      cart_checkout(req, vec);
+      resp = cart_checkout(req, vec);
       break;
     case REQUEST_TYPE::CART_SHOW:
-      cart_show(req, vec);
+      resp = cart_show(req, vec);
       break;
     case REQUEST_TYPE::ORDERS_SHOW:
-      orders_show(req, vec);
+      resp = orders_show(req, vec);
       break;
     case REQUEST_TYPE::ORDERS_PAY:
-      orders_pay(req, vec);
+      resp = orders_pay(req, vec);
       break;
     case REQUEST_TYPE::ORDERS_CANCEL:
-      orders_cancel(req, vec);
+      resp = orders_cancel(req, vec);
       break;
     case REQUEST_TYPE::LIST:
-      list(req, vec);
+      resp = list(req, vec);
       break;
     case REQUEST_TYPE::LOGIN:
-      login(req, vec);
+      resp = login(req, vec);
       break;
     case REQUEST_TYPE::SIGNUP:
-      signup(req, vec);
+      resp = signup(req, vec);
       break;
     case REQUEST_TYPE::PASSWD:
-      passwd(req, vec);
+      resp = passwd(req, vec);
       break;
     case REQUEST_TYPE::SELLER_ADD:
-      seller_add(req, vec);
+      resp = seller_add(req, vec);
       break;
     case REQUEST_TYPE::SELLER_EDIT:
-      seller_edit(req, vec);
+      resp = seller_edit(req, vec);
       break;
     case REQUEST_TYPE::SELLER_LIST:
-      seller_list(req, vec);
+      resp = seller_list(req, vec);
       break;
     case REQUEST_TYPE::WALLET_SHOW:
-      wallet_show(req, vec);
+      resp = wallet_show(req, vec);
       break;
     case REQUEST_TYPE::WALLET_TOPUP:
-      wallet_topup(req, vec);
+      resp = wallet_topup(req, vec);
       break;
     default:
       resp.success = false;
@@ -100,68 +100,72 @@ void session::serve(sockpp::tcp_socket sock) {
   sock.close();
 }
 
-void
+data_type::response_data
 session::login(request_data &req, vector<string> &vec) {
 
 }
 
-void
+data_type::response_data
 session::signup(request_data &req, vector<string> &vec) {
+  if (base_user::exist(vec[0])) {
+    return response_data(0, "User Already Exists!");
+  }
   auto data = unique_ptr<user_data>
           (new user_data{0, 0, int(USER_TYPE::CUSTOMER), vec[0], vec[1]});
   customer user(std::move(data));
   user.insert();
+  return response_data(1, vec[0]);
 }
 
-void
+data_type::response_data
 session::add_to_cart(request_data &req, vector<string> &vec) {
 }
 
-void
+data_type::response_data
 session::cart_checkout(request_data &req, vector<string> &vec) {
 }
 
-void
+data_type::response_data
 session::cart_show(request_data &req, vector<string> &vec) {
 }
 
-void
+data_type::response_data
 session::orders_show(request_data &req, vector<string> &vec) {
 }
 
-void
+data_type::response_data
 session::orders_pay(request_data &req, vector<string> &vec) {
 }
 
-void
+data_type::response_data
 session::orders_cancel(request_data &req, vector<string> &vec) {
 }
 
-void
+data_type::response_data
 session::list(request_data &req, vector<string> &vec) {
 }
 
-void
+data_type::response_data
 session::passwd(request_data &req, vector<string> &vec) {
 }
 
-void
+data_type::response_data
 session::seller_add(request_data &req, vector<string> &vec) {
 }
 
-void
+data_type::response_data
 session::seller_edit(request_data &req, vector<string> &vec) {
 }
 
-void
+data_type::response_data
 session::seller_list(request_data &req, vector<string> &vec) {
 }
 
-void
+data_type::response_data
 session::wallet_show(request_data &req, vector<string> &vec) {
 }
 
-void
+data_type::response_data
 session::wallet_topup(request_data &req, vector<string> &vec) {
 }
 
