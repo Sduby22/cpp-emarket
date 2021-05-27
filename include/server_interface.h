@@ -12,6 +12,7 @@ class base_user {
 public:
   static bool exist(const std::string& name);
   static std::unique_ptr<base_user> get(data_type::id_type id);
+  static std::unique_ptr<base_user> get(const std::string &name);
   using USER_TYPE = data_type::USER_TYPE;
   base_user(std::unique_ptr<data_type::user_data> &&ptr)
     : user(std::move(ptr)) {}
@@ -19,6 +20,8 @@ public:
   virtual ~base_user() {}
   void update();
   data_type::id_type insert();
+  bool checkPass(const std::string &pass) { return pass == user->passwd; }
+  void changePass(const std::string &pass) { user->passwd = pass; update(); } 
 private:
   std::unique_ptr<data_type::user_data> user;
 };
@@ -37,12 +40,12 @@ public:
   seller(std::unique_ptr<data_type::user_data> &&ptr)
     : base_user(std::move(ptr)) {}
   virtual USER_TYPE getUserType() { return USER_TYPE::SELLER; }
-  
 };
 
 class base_item {
 public:
   static std::unique_ptr<base_item> get(data_type::id_type id);
+  static std::vector<std::unique_ptr<base_item>> query(const std::string &str);
   using ITEM_TYPE = data_type::ITEM_TYPE;
   base_item(std::unique_ptr<data_type::item_data> &&ptr)
     : item(std::move(ptr)) {}

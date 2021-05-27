@@ -6,6 +6,7 @@ namespace my_user {
 
   using namespace data_type;
   using namespace sqlite_orm;
+  using namespace std;
 
   auto storage = make_storage(
       "data/db.sqlite",
@@ -44,9 +45,21 @@ namespace my_user {
     if (!p)
       return nullptr;
     else if (p->type == int(USER_TYPE::CUSTOMER))
-      return std::unique_ptr<base_user>(new customer(std::move(p)));
+      return std::make_unique<customer>(std::move(p));
     else if (p->type == int(USER_TYPE::SELLER))
-      return std::unique_ptr<base_user>(new seller(std::move(p)));
+      return std::make_unique<seller>(std::move(p));
+    return nullptr;
+  }
+
+  std::unique_ptr<base_user> base_user::get(const std::string &name) {
+    auto match = storage.get_all<user_data>(where(c(&user_data::name) == name));
+    if (match.empty())
+      return nullptr;
+    auto p(std::make_unique<user_data>(match[0]));
+    if (p->type == int(USER_TYPE::CUSTOMER))
+      return std::make_unique<customer>(std::move(p));
+    else if (p->type == int(USER_TYPE::SELLER))
+      return std::make_unique<seller>(std::move(p));
     return nullptr;
   }
 
@@ -56,13 +69,30 @@ namespace my_user {
       return nullptr;
     switch(ITEM_TYPE(p->type)) {
       case ITEM_TYPE::BOOK:
-        return std::unique_ptr<base_item>(new book_item(std::move(p)));
+        return make_unique<book_item>(std::move(p));
       case ITEM_TYPE::FOOD:
-        return std::unique_ptr<base_item>(new food_item(std::move(p)));
+        return make_unique<food_item>(std::move(p));
       case ITEM_TYPE::CLOTHING:
-        return std::unique_ptr<base_item>(new cloth_item(std::move(p)));
+        return make_unique<cloth_item>(std::move(p));
     }
     return nullptr;
+  }
+
+  static std::vector<std::unique_ptr<base_item>> query(const std::string &str) { 
+    auto whereNameLike = storage.get_all<item_data>(where(like(&item_data::name, "%"+str+"%")));
+    vector<unique_ptr<base_item>> vec;
+    for (auto item: whereNameLike) {
+      auto p(std::make_unique<item_data>(item));
+      switch(ITEM_TYPE(item.type)) {
+        case ITEM_TYPE::CLOTHING:
+          vec.emplace_back(make_unique<cloth_item>(std::move(p)));
+        case ITEM_TYPE::BOOK:
+          vec.emplace_back(make_unique<book_item>(std::move(p)));
+        case ITEM_TYPE::FOOD:
+          vec.emplace_back(make_unique<food_item>(std::move(p)));
+      }
+    }
+    return vec;
   }
 
   void base_user::update() {

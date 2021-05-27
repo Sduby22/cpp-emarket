@@ -95,7 +95,11 @@ std::vector<std::string> base_data::split(const std::string &s,
     res.push_back(token);
   }
 
-  res.push_back(s.substr(pos_start));
+  auto tmp = s.substr(pos_start);
+  if (tmp.back() == 0) {
+    tmp.resize(tmp.length()-1);
+  }
+  res.push_back(std::move(tmp));
   return res;
 }
 

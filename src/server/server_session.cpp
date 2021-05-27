@@ -102,7 +102,12 @@ void session::serve(sockpp::tcp_socket sock) {
 
 data_type::response_data
 session::login(request_data &req, vector<string> &vec) {
-
+  auto user = base_user::get(vec[0]);
+  if (!user)
+    return response_data(0, "User Does not Exist!");
+  else if (!user->checkPass(vec[1]))
+    return response_data(0, "Wrong Password!");
+  return response_data(1, vec[0]);
 }
 
 data_type::response_data
