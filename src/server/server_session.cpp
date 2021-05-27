@@ -104,16 +104,16 @@ data_type::response_data
 session::login(request_data &req, vector<string> &vec) {
   auto user = base_user::get(vec[0]);
   if (!user)
-    return response_data(0, "User Does not Exist!");
+    return response_data(0, "user does not exist!");
   else if (!user->checkPass(vec[1]))
-    return response_data(0, "Wrong Password!");
-  return response_data(1, vec[0]);
+    return response_data(0, "wrong password!");
+  return response_data(1, user->getID() , vec[0]);
 }
 
 data_type::response_data
 session::signup(request_data &req, vector<string> &vec) {
   if (base_user::exist(vec[0])) {
-    return response_data(0, "User Already Exists!");
+    return response_data(0, "user already exists!");
   }
   auto data = unique_ptr<user_data>
           (new user_data{0, 0, int(USER_TYPE::CUSTOMER), vec[0], vec[1]});
@@ -152,6 +152,14 @@ session::list(request_data &req, vector<string> &vec) {
 
 data_type::response_data
 session::passwd(request_data &req, vector<string> &vec) {
+  auto user = base_user::get(req.user_id);
+  if (!user)
+    return response_data(0, "user does not exist!");
+  if (user->checkPass(vec[0])) {
+    user->changePass(vec[1]);
+    return response_data(1, "successfully updated password.");
+  } else
+    return response_data(0, "incorrect old password.");
 }
 
 data_type::response_data

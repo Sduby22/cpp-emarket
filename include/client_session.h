@@ -44,20 +44,20 @@ private:
   void logout();
   void login(std::string&);
   void signup(std::string&);
-  void search(std::string&) const;
-  void list() const;
-  void passwd() const;
-  void add_to_cart(data_type::id_type) const;
-  void cart_checkout() const;
-  void cart_show() const;
-  void wallet_show() const;
-  void wallet_topup(double) const;
-  void orders_show() const;
-  void orders_cancel(data_type::id_type) const;
-  void orders_pay(data_type::id_type) const;
-  void seller_list() const;
-  void seller_edit(data_type::id_type) const;
-  void seller_add() const;
+  void search(std::string&);
+  void list();
+  void passwd();
+  void add_to_cart(data_type::id_type);
+  void cart_checkout();
+  void cart_show();
+  void wallet_show();
+  void wallet_topup(double);
+  void orders_show();
+  void orders_cancel(data_type::id_type);
+  void orders_pay(data_type::id_type);
+  void seller_list();
+  void seller_edit(data_type::id_type);
+  void seller_add();
 };
 
 }

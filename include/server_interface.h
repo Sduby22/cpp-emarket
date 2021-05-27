@@ -18,10 +18,11 @@ public:
     : user(std::move(ptr)) {}
   virtual USER_TYPE getUserType() = 0;
   virtual ~base_user() {}
-  void update();
-  data_type::id_type insert();
-  bool checkPass(const std::string &pass) { return pass == user->passwd; }
+  void update() const;
+  data_type::id_type insert() const;
+  bool checkPass(const std::string &pass) const { return pass == user->passwd; }
   void changePass(const std::string &pass) { user->passwd = pass; update(); } 
+  data_type::id_type getID() const { return user->id; };
 private:
   std::unique_ptr<data_type::user_data> user;
 };

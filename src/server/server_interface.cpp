@@ -95,7 +95,7 @@ namespace my_user {
     return vec;
   }
 
-  void base_user::update() {
+  void base_user::update() const {
     storage.update(*(this->user));
   }
 
@@ -107,7 +107,7 @@ namespace my_user {
     return storage.insert(*(this->item)); 
   }
 
-  id_type base_user::insert() {
+  id_type base_user::insert() const {
     return storage.insert(*(this->user));
   }
 

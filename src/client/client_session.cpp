@@ -1,5 +1,6 @@
 #include "client_session.h"
 #include "cli/cli.h"
+#include "data_type.h"
 #include "sockpp/inet_address.h"
 #include <memory>
 #include <ostream>
@@ -55,7 +56,7 @@ std::unique_ptr<cli::Menu> client_session::gen_user_menu() {
                "Search for items", {"item name"});
   menu->Insert("list", [&](std::ostream &) { list(); },
                "List all items");
-  menu->Insert("cart", [&](std::ostream&, data_type::id_type id)
+  menu->Insert("add", [&](std::ostream&, data_type::id_type id)
       { add_to_cart(id); }, "Add item to cart", {"item id"});
   menu->Insert("checkout", [&](std::ostream&)
       { cart_checkout(); }, "Checkout the shopping cart");
@@ -69,6 +70,8 @@ std::unique_ptr<cli::Menu> client_session::gen_user_menu() {
       { orders_cancel(id); }, "Cancel an order", {"order id"});
   menu->Insert("pay", [&](std::ostream&, data_type::id_type id)
       { orders_pay(id); }, "Pay an order", {"order id"});
+  menu->Insert("passwd", [&](std::ostream&)
+      { passwd(); }, "Change the Password");
 
   auto seller_menu = std::make_unique<cli::Menu>("seller");
   seller_menu->Insert("list", [&](std::ostream&)
@@ -122,59 +125,66 @@ void client_session::login(std::string &asd) {
   }
 }
 
-void client_session::search(string &str) const {
+void client_session::search(string &str) {
   
 }
 
-void client_session::list() const {
+void client_session::list() {
 
 }
 
-void client_session::passwd() const {
+void client_session::passwd() {
+  std::string _old, _new;
+  cout << "old password: ";
+  cin >> _old;
+  cout << "new password: ";
+  cin >> _new;
+  request_data req(REQUEST_TYPE::PASSWD, current_user, 0, 
+      base_data::join({_old, _new}));
+  auto resp = feed(req);
+}
+
+void client_session::add_to_cart(data_type::id_type id) {
 
 }
 
-void client_session::add_to_cart(data_type::id_type id) const {
+void client_session::cart_checkout() {
 
 }
 
-void client_session::cart_checkout() const {
+void client_session::cart_show() {
 
 }
 
-void client_session::cart_show() const {
+void client_session::wallet_show() {
 
 }
 
-void client_session::wallet_show() const {
+void client_session::wallet_topup(double x) {
 
 }
 
-void client_session::wallet_topup(double x) const {
+void client_session::orders_show() {
 
 }
 
-void client_session::orders_show() const {
+void client_session::orders_cancel(data_type::id_type id) {
 
 }
 
-void client_session::orders_cancel(data_type::id_type id) const {
+void client_session::orders_pay(data_type::id_type id) {
 
 }
 
-void client_session::orders_pay(data_type::id_type id) const {
+void client_session::seller_list() {
 
 }
 
-void client_session::seller_list() const {
+void client_session::seller_edit(data_type::id_type id) {
 
 }
 
-void client_session::seller_edit(data_type::id_type id) const {
-
-}
-
-void client_session::seller_add() const {
+void client_session::seller_add() {
 
 }
 
