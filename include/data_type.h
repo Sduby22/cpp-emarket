@@ -4,6 +4,7 @@
 
 #include <string>
 #include <utility>
+#include <vector>
 #include "sockpp/stream_socket.h"
 
 namespace data_type {
@@ -26,6 +27,9 @@ struct base_data {
   
   template<typename T>
   static ssize_t read(sockpp::stream_socket &sock, T& buf);
+
+  static std::vector<std::string> split(const std::string &str, char=27);
+  static std::string join(const std::vector<std::string> &vec, char=27);
   
   virtual std::string dump() const = 0;
 
@@ -41,14 +45,14 @@ struct request_data: base_data {
     : type(type), user_id(user_id), target(target)
   {}
 
-  request_data(REQUEST_TYPE type, std::string payload1, std::string payload2)
-    : type(type), payload1(payload1), payload2(payload2), user_id(0), target(0)
+  request_data(REQUEST_TYPE type, std::string payload1)
+    : type(type), payload(payload1), user_id(0), target(0)
   {}
 
   request_data(REQUEST_TYPE type, id_type user_id, id_type target,
-               std::string payload1, std::string payload2)
+               std::string payload1)
     : type(type), user_id(user_id), target(target), 
-      payload1(payload1), payload2(payload2)
+      payload(payload1)
   {}
 
   request_data() {}
@@ -56,8 +60,7 @@ struct request_data: base_data {
   REQUEST_TYPE type;
   id_type user_id;
   id_type target;
-  std::string payload1;
-  std::string payload2;
+  std::string payload;
 };
 
 
@@ -67,16 +70,16 @@ struct response_data: base_data {
   virtual std::string dump() const;
 
   response_data(int success, id_type user_id, std::string msg)
-    : success(success), user_id(user_id), msg(msg) {}
+    : success(success), user_id(user_id), payload(msg) {}
 
   response_data(int success, std::string msg)
-    : success(success), msg(msg), user_id(0) {}
+    : success(success), payload(msg), user_id(0) {}
 
   response_data() {}
 
   int success;
   id_type user_id;
-  std::string msg;
+  std::string payload;
 };
 
 

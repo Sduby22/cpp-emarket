@@ -6,6 +6,7 @@
 #include <string>
 
 using namespace std;
+using data_type::base_data;
 using data_type::request_data;
 using data_type::response_data;
 using data_type::REQUEST_TYPE;
@@ -98,7 +99,7 @@ void client_session::signup(std::string &asd) {
   if (!(passwd==confirm))
     cout << "error: passwords don't match!" << endl;
   else {
-    request_data req(REQUEST_TYPE::SIGNUP, asd, passwd);
+    request_data req(REQUEST_TYPE::SIGNUP, base_data::join({asd, passwd}));
     auto resp = feed(req);
     if (resp.success)
       current_user = resp.user_id;
@@ -110,10 +111,10 @@ void client_session::login(std::string &asd) {
   cout << "login as " << asd << "..." << endl;
   cout << "password:";
   getline(cin, passwd);
-  request_data req(REQUEST_TYPE::LOGIN, std::move(asd), std::move(passwd));
+  request_data req(REQUEST_TYPE::LOGIN, base_data::join({asd, passwd}));
   auto resp = feed(req);
   if(resp.success) {
-    cout << "logged in as " << resp.msg << " success!" << endl;
+    cout << "logged in as " << resp.payload << " success!" << endl;
     session->Exit();
     current_user = resp.user_id;
     session = std::make_unique<cli_session>(gen_user_menu());

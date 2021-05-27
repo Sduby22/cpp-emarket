@@ -50,8 +50,35 @@ namespace my_user {
     return nullptr;
   }
 
+  std::unique_ptr<base_item> base_item::get(id_type id) {
+    auto p = storage.get_pointer<item_data>(id);
+    if (!p)
+      return nullptr;
+    switch(ITEM_TYPE(p->type)) {
+      case ITEM_TYPE::BOOK:
+        return std::unique_ptr<base_item>(new book_item(std::move(p)));
+      case ITEM_TYPE::FOOD:
+        return std::unique_ptr<base_item>(new food_item(std::move(p)));
+      case ITEM_TYPE::CLOTHING:
+        return std::unique_ptr<base_item>(new cloth_item(std::move(p)));
+    }
+    return nullptr;
+  }
+
   void base_user::update() {
-    // storage.update(this->user);
+    storage.update(*(this->user));
+  }
+
+  void base_item::update() {
+    storage.update(*(this->item));
+  }
+
+  id_type base_item::insert() {
+    return storage.insert(*(this->item)); 
+  }
+
+  id_type base_user::insert() {
+    return storage.insert(*(this->user));
   }
 
 }

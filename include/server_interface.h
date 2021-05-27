@@ -10,14 +10,15 @@ namespace my_user {
 
 class base_user {
 public:
+  static std::unique_ptr<base_user> get(data_type::id_type id);
   using USER_TYPE = data_type::USER_TYPE;
   base_user(std::unique_ptr<data_type::user_data> &&ptr)
     : user(std::move(ptr)) {}
   virtual USER_TYPE getUserType() = 0;
   virtual ~base_user() {}
   void update();
+  data_type::id_type insert();
 private:
-  static std::unique_ptr<base_user> get(data_type::id_type id);
   std::unique_ptr<data_type::user_data> user;
 };
 
@@ -36,6 +37,45 @@ public:
     : base_user(std::move(ptr)) {}
   virtual USER_TYPE getUserType() { return USER_TYPE::SELLER; }
   
+};
+
+class base_item {
+public:
+  static std::unique_ptr<base_item> get(data_type::id_type id);
+  using ITEM_TYPE = data_type::ITEM_TYPE;
+  base_item(std::unique_ptr<data_type::item_data> &&ptr)
+    : item(std::move(ptr)) {}
+  virtual long long int getPrice() { 
+    return static_cast<long long int>(item->price * item->discount); 
+  };
+  virtual std::string getPriceStr() { 
+    return std::to_string(getPrice() / 100); 
+  }
+  virtual ~base_item() {}
+  void update();
+  data_type::id_type insert();
+private:
+  std::unique_ptr<data_type::item_data> item;
+};
+
+class food_item: public base_item {
+public:
+  food_item(std::unique_ptr<data_type::item_data> &&ptr)
+    : base_item(std::move(ptr)) {}
+};
+
+class cloth_item: public base_item {
+public:
+  cloth_item(std::unique_ptr<data_type::item_data> &&ptr)
+    : base_item(std::move(ptr)) {}
+
+};
+
+class book_item: public base_item {
+public:
+  book_item(std::unique_ptr<data_type::item_data> &&ptr)
+    : base_item(std::move(ptr)) {}
+
 };
 
 } // namespace my_user
