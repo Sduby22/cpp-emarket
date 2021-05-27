@@ -78,6 +78,11 @@ public:
 
 };
 
+class db_handler {
+public:
+  static void db_sync();
+};
+
 } // namespace my_user
 
 #endif /* end of include guard: SERVER_INTERFACE_H_48NBXEJM */

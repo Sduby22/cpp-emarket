@@ -81,4 +81,8 @@ namespace my_user {
     return storage.insert(*(this->user));
   }
 
+  void db_handler::db_sync() { 
+    storage.sync_schema();
+  }
+
 }

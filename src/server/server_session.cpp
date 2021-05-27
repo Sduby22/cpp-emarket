@@ -12,6 +12,7 @@ using namespace std;
 namespace server_session {
 
 void session::Start() {
+  db_handler::db_sync();
   while (1) {
     auto sock = acc.accept();
 
@@ -109,7 +110,7 @@ session::signup(request_data &req, vector<string> &vec) {
   auto data = unique_ptr<user_data>
           (new user_data{0, 0, int(USER_TYPE::CUSTOMER), vec[0], vec[1]});
   customer user(std::move(data));
-  // user.insert();
+  user.insert();
 }
 
 void
