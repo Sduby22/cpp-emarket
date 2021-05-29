@@ -2,6 +2,7 @@
 #include "data_type.h"
 #include <iostream>
 #include <memory>
+#include <string>
 #include <thread>
 #include <vector>
 
@@ -107,7 +108,7 @@ session::login(request_data &req, vector<string> &vec) {
     return response_data(0, "user does not exist!");
   else if (!user->checkPass(vec[1]))
     return response_data(0, "wrong password!");
-  return response_data(1, user->getID() , vec[0]);
+  return response_data(1, user->get_id() , vec[0]);
 }
 
 data_type::response_data
@@ -116,7 +117,7 @@ session::signup(request_data &req, vector<string> &vec) {
     return response_data(0, "user already exists!");
   }
   auto data = unique_ptr<user_data>
-          (new user_data{0, 0, int(USER_TYPE::CUSTOMER), vec[0], vec[1]});
+          (new user_data{0, 0, int(req.target), vec[0], vec[1]});
   customer user(std::move(data));
   user.insert();
   return response_data(1, vec[0]);
@@ -148,6 +149,12 @@ session::orders_cancel(request_data &req, vector<string> &vec) {
 
 data_type::response_data
 session::list(request_data &req, vector<string> &vec) {
+  auto list = base_item::query("");
+  string msg;
+  for (auto &item: list) {
+    msg += item->to_string() + "\n\n";
+  }
+  return response_data(1, msg);
 }
 
 data_type::response_data
@@ -164,6 +171,15 @@ session::passwd(request_data &req, vector<string> &vec) {
 
 data_type::response_data
 session::seller_add(request_data &req, vector<string> &vec) {
+  string& name = vec[0];
+  string& description = vec[1];
+  int type = req.target;
+  long long int price = std::stoll(vec[2]);
+  unique_ptr<item_data> data
+    (new item_data{0, req.user_id, 1, 0, 1, type, price, description, name});
+  base_item item(std::move(data));
+  auto id = item.insert();
+  return response_data(1, "add succeeded! item id is "+to_string(id));
 }
 
 data_type::response_data

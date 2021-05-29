@@ -22,7 +22,9 @@ public:
   data_type::id_type insert() const;
   bool checkPass(const std::string &pass) const { return pass == user->passwd; }
   void changePass(const std::string &pass) { user->passwd = pass; update(); } 
-  data_type::id_type getID() const { return user->id; };
+  data_type::id_type get_id() const { return user->id; };
+  std::string get_name() const {return user->name;};
+  std::string get_balance() const {return std::to_string(user->balance / 100);}
 private:
   std::unique_ptr<data_type::user_data> user;
 };
@@ -46,6 +48,7 @@ public:
 class base_item {
 public:
   static std::unique_ptr<base_item> get(data_type::id_type id);
+  static std::vector<std::unique_ptr<base_item>> get_all();
   static std::vector<std::unique_ptr<base_item>> query(const std::string &str);
   using ITEM_TYPE = data_type::ITEM_TYPE;
   base_item(std::unique_ptr<data_type::item_data> &&ptr)
@@ -54,12 +57,18 @@ public:
     return static_cast<long long int>(item->price * item->discount); 
   };
   virtual std::string getPriceStr() { 
-    return std::to_string(getPrice() / 100); 
+    auto pricestr = std::to_string(getPrice());
+    if (pricestr.length() > 2)
+      pricestr.insert(pricestr.end()-2, '.');
+    return pricestr;
   }
   virtual ~base_item() {}
   void update();
   data_type::id_type insert();
+  std::string to_string();
 private:
+  std::string get_type() const;
+  static std::unique_ptr<base_item> get_ptr_from_data(data_type::item_data);
   std::unique_ptr<data_type::item_data> item;
 };
 

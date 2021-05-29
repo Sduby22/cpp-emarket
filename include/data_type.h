@@ -108,9 +108,17 @@ struct item_data {
 struct order_data {
   id_type id;
   id_type item_id;
+  size_t quantity;
   id_type customer;
   id_type seller;
   long long int price;
+};
+
+
+struct item_cart {
+  id_type item_id;
+  id_type user;
+  size_t quantity;
 };
 
 

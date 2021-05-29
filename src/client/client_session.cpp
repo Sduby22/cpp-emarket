@@ -14,6 +14,7 @@ using data_type::REQUEST_TYPE;
 
 namespace client {
 
+typedef long long int int64;
 data_type::response_data 
 client_session::feed(const data_type::request_data &req) {
   sockpp::tcp_connector conn;
@@ -93,16 +94,30 @@ void client_session::logout() {
 }
 
 void client_session::signup(std::string &asd) {
-  std::string passwd, confirm;
+  std::string passwd, confirm, typestr;
+  int type = 0;
   cout << "sign up as " << asd << "..." << endl;
   cout << "set your passwd: ";
   getline(cin, passwd);
   cout << "confirm your passwd: ";
   getline(cin, confirm);
+  cout << "are you a customer(0) or a seller(1)?: ";
+  getline(cin, typestr);
+  try {
+    type = std::stoi(typestr);
+    if (type < 0 || type > 1) {
+      cout << "error: invalid input" << endl;
+      return;
+    }
+  } catch(...) {
+    cout << "error: invalid input" << endl;
+    return;
+  }
   if (!(passwd==confirm))
     cout << "error: passwords don't match!" << endl;
   else {
-    request_data req(REQUEST_TYPE::SIGNUP, base_data::join({asd, passwd}));
+    request_data req(REQUEST_TYPE::SIGNUP, 0, type, 
+                     base_data::join({asd, passwd}));
     auto resp = feed(req);
     if (resp.success)
       current_user = resp.user_id;
@@ -130,7 +145,8 @@ void client_session::search(string &str) {
 }
 
 void client_session::list() {
-
+  request_data req(REQUEST_TYPE::LIST, current_user, 0);
+  auto resp = feed(req);
 }
 
 void client_session::passwd() {
@@ -185,7 +201,27 @@ void client_session::seller_edit(data_type::id_type id) {
 }
 
 void client_session::seller_add() {
-
+  string name, description, price_str, type_str;
+  double price;
+  int type;
+  cout << "input item name: ";
+  getline(cin, name);
+  cout << "input item description: ";
+  getline(cin, description);
+  cout << "input item price: ";
+  getline(cin, price_str);
+  cout << "input item type: book(0), food(1), clothing(2): ";
+  getline(cin, type_str);
+  try {
+    type = stoi(type_str);
+    price = stod(price_str);
+  } catch(...) {
+    cout << "error: invalid input" << endl;
+    return;
+  }
+  request_data req(REQUEST_TYPE::SELLER_ADD, current_user, type
+    , base_data::join({name, description, to_string(int64(price*100))}));
+  auto resp = feed(req);
 }
 
 } // namespace client

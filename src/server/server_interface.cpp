@@ -1,24 +1,25 @@
 #include "server_interface.h"
+#include "data_type.h"
 #include "sqlite/sqlite_orm.h"
 #include <memory>
+#include <string>
 
 namespace my_user {
 
-  using namespace data_type;
-  using namespace sqlite_orm;
-  using namespace std;
+using namespace data_type;
+using namespace sqlite_orm;
+using namespace std;
 
-  auto storage = make_storage(
-      "data/db.sqlite",
-      make_table(
+auto storage = make_storage(
+    "data/db.sqlite",
+    make_table(
         "users",
         make_column("id", &user_data::id, autoincrement(), primary_key()),
         make_column("balance", &user_data::balance),
         make_column("type", &user_data::type),
         make_column("name", &user_data::name),
-        make_column("passwd", &user_data::passwd)
-      ),
-      make_table(
+        make_column("passwd", &user_data::passwd)),
+    make_table(
         "items",
         make_column("id", &item_data::id, autoincrement(), primary_key()),
         make_column("seller", &item_data::seller),
@@ -28,17 +29,18 @@ namespace my_user {
         make_column("type", &item_data::type),
         make_column("price", &item_data::price),
         make_column("description", &item_data::description),
-        make_column("name", &item_data::name)
-      ),
-      make_table(
+        make_column("name", &item_data::name)),
+    make_table(
         "orders",
         make_column("id", &order_data::id, autoincrement(), primary_key()),
         make_column("item_id", &order_data::item_id),
+        make_column("quantity", &order_data::quantity),
         make_column("customer", &order_data::customer),
         make_column("seller", &order_data::seller),
-        make_column("price", &order_data::price)
-      )
-  );
+        make_column("price", &order_data::price)),
+    make_table("item_cart", make_column("item_id", &item_cart::item_id),
+               make_column("user", &item_cart::user),
+               make_column("quantity", &item_cart::quantity)));
 
   std::unique_ptr<base_user> base_user::get(id_type id) {
     auto p = storage.get_pointer<user_data>(id);
@@ -63,6 +65,19 @@ namespace my_user {
     return nullptr;
   }
 
+  std::unique_ptr<base_item> base_item::get_ptr_from_data(item_data data) {
+    auto data_ptr(make_unique<item_data>(data));
+    switch(ITEM_TYPE(data_ptr->type)) {
+      case ITEM_TYPE::BOOK:
+        return make_unique<book_item>(std::move(data_ptr));
+      case ITEM_TYPE::FOOD:
+        return make_unique<food_item>(std::move(data_ptr));
+      case ITEM_TYPE::CLOTHING:
+        return make_unique<cloth_item>(std::move(data_ptr));
+    }
+    return nullptr;
+  }
+
   std::unique_ptr<base_item> base_item::get(id_type id) {
     auto p = storage.get_pointer<item_data>(id);
     if (!p)
@@ -78,19 +93,28 @@ namespace my_user {
     return nullptr;
   }
 
-  static std::vector<std::unique_ptr<base_item>> query(const std::string &str) { 
-    auto whereNameLike = storage.get_all<item_data>(where(like(&item_data::name, "%"+str+"%")));
+  std::vector<unique_ptr<base_item>> base_item::get_all() {
+    vector<unique_ptr<base_item>> item_vec;
+    for (auto &item: storage.iterate<item_data>()) {
+      item_vec.push_back(get_ptr_from_data(item));
+    }
+    return item_vec;
+  }
+
+  vector<unique_ptr<base_item>> base_item::query(const string &str) {
     vector<unique_ptr<base_item>> vec;
-    for (auto item: whereNameLike) {
-      auto p(std::make_unique<item_data>(item));
-      switch(ITEM_TYPE(item.type)) {
-        case ITEM_TYPE::CLOTHING:
-          vec.emplace_back(make_unique<cloth_item>(std::move(p)));
-        case ITEM_TYPE::BOOK:
-          vec.emplace_back(make_unique<book_item>(std::move(p)));
-        case ITEM_TYPE::FOOD:
-          vec.emplace_back(make_unique<food_item>(std::move(p)));
+    if (!str.empty()) {
+      auto whereNameLike = storage.get_all<item_data>
+            (where(like(&item_data::name, "%"+str+"%")));
+      for (auto &item: whereNameLike) {
+        vec.push_back(get_ptr_from_data(item));
       }
+    } else {
+      auto whereNameLike = storage.get_all<item_data>();
+      for (auto &item: whereNameLike) {
+        vec.push_back(get_ptr_from_data(item));
+      }
+
     }
     return vec;
   }
@@ -120,4 +144,31 @@ namespace my_user {
     return !match.empty();
   }
 
-}
+  string base_item::to_string() {
+    string res;
+    res += item->name + "\n";
+    res += getPriceStr() + "$";
+    res += item->discount == 1 ? "\n" : " (now "
+            + std::to_string(int((item->discount - 1) * 100)) + "%)\n";
+    res += item->description + "\n";
+    auto seller = base_user::get(item->seller);
+    res += "seller: " + seller->get_name() + "\n";
+    res += "stock: " + std::to_string(item->stock - item->frozen) + "\n";
+    res += "type: " + get_type();
+    return res;
+  }
+
+  string base_item::get_type() const {
+    switch(ITEM_TYPE(item->type)) {
+      case ITEM_TYPE::BOOK:
+        return "book";
+      case ITEM_TYPE::CLOTHING:
+        return "clothing";
+      case ITEM_TYPE::FOOD:
+        return "food";
+      default:
+        return "unknown";
+    }
+  }
+
+  } // namespace my_user
