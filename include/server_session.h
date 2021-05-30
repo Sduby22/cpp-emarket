@@ -18,12 +18,18 @@ namespace server_session {
     login(data_type::request_data &req, std::vector<std::string> &vec);
     static data_type::response_data
     signup(data_type::request_data &req, std::vector<std::string> &vec);
+
     static data_type::response_data
     add_to_cart(data_type::request_data &req, std::vector<std::string> &vec);
     static data_type::response_data
     cart_checkout(data_type::request_data &req, std::vector<std::string> &vec);
     static data_type::response_data
     cart_show(data_type::request_data &req, std::vector<std::string> &vec);
+    static data_type::response_data
+    cart_edit(data_type::request_data &req, std::vector<std::string> &vec);
+    static data_type::response_data
+    cart_remove(data_type::request_data &req, std::vector<std::string> &vec);
+
     static data_type::response_data
     orders_show(data_type::request_data &req, std::vector<std::string> &vec);
     static data_type::response_data

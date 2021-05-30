@@ -1,6 +1,7 @@
 #include "server_interface.h"
 #include "data_type.h"
 #include "sqlite/sqlite_orm.h"
+#include <algorithm>
 #include <memory>
 #include <string>
 
@@ -38,9 +39,11 @@ auto storage = make_storage(
         make_column("customer", &order_data::customer),
         make_column("seller", &order_data::seller),
         make_column("price", &order_data::price)),
-    make_table("item_cart", make_column("item_id", &item_cart::item_id),
-               make_column("user", &item_cart::user),
-               make_column("quantity", &item_cart::quantity)));
+    make_table("item_cart", 
+        make_column("row_id", &item_cart::row_id, autoincrement(), primary_key()),
+        make_column("item_id", &item_cart::item_id),
+        make_column("user", &item_cart::user),
+        make_column("quantity", &item_cart::quantity)));
 
   std::unique_ptr<base_user> base_user::get(id_type id) {
     auto p = storage.get_pointer<user_data>(id);
@@ -203,4 +206,78 @@ auto storage = make_storage(
   }
 
   void base_item::remove() { storage.remove<item_data>(item->id); }
+
+  cart::cart(id_type user)
+    : user(user), items(storage.get_all<item_cart>(where(c(&item_cart::user) == user))) 
+  {}
+
+  bool cart::edit(data_type::id_type row_id, size_t quantity) {
+    auto f = [&](item_cart& data){ return data.row_id == row_id; };
+    auto found = find_if(items.begin(), items.end(), f);
+    if (found == items.end())
+      return false;
+    else {
+      if (quantity == 0) {
+        storage.remove<item_cart>(row_id);
+        return true;
+      } else {
+        found->quantity = quantity;
+        storage.update<item_cart>(*found);
+        return true;
+      }
+    }
+  }
+
+  id_type cart::add(data_type::id_type item_id, size_t quantity) {
+    auto f = [&](item_cart& data){ return data.item_id == item_id; };
+    auto found = find_if(items.begin(), items.end(), f);
+    if (found == items.end()) {
+      item_cart data{0, item_id, user, quantity};
+      return storage.insert<item_cart>(data);
+    } else {
+      found->quantity += quantity;
+      storage.update(*found);
+      return found->row_id;
+    }
+  }
+
+  void cart::checkout() {
+    
+  }
+  
+  long long int cart::getPrice() {
+    long long int price = 0;
+    for (auto &item: items) {
+      auto itemptr = base_item::get(item.item_id);
+      price += itemptr->getPrice() * item.quantity;
+    }
+    return price;
+  }
+
+  std::string cart::getPriceStr() {
+    string res;
+    res = to_string(getPrice());
+    switch (res.length()) {
+      case 1:
+        res.insert(0, "0.0");
+        break;
+      case 2:
+        res.insert(0, "0.");
+        break;
+      default:
+        res.insert(res.end()-2, '.');
+    }
+    return res;
+  }
+
+  std::string cart::list() {
+    string res = "row_id\tquantity\tprice\tname\n";
+    for (auto &item: items) {
+      auto item_ptr = base_item::get(item.item_id);
+      res+=to_string(item.row_id) + "\t" + to_string(item.quantity) + "\t"
+         + item_ptr->getPriceStr() + "$\t" + item_ptr->get_name() + "\n";
+    }
+    res += "total: " + getPriceStr() + "$\n";
+    return res;
+  }
   } // namespace my_user

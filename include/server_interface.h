@@ -3,6 +3,7 @@
 
 #include <memory>
 #include <string>
+#include <vector>
 #include "data_type.h"
 #include "sqlite/sqlite_orm.h"
 
@@ -81,6 +82,7 @@ public:
   void update();
   data_type::id_type insert();
   std::string to_string();
+  std::string get_name() const { return item->name; };
   bool edit(std::vector<std::string> &vec);
   void remove();
 private:
@@ -112,6 +114,21 @@ public:
 class db_handler {
 public:
   static void db_sync();
+};
+
+class cart {
+  public:
+    cart(data_type::id_type user);
+    std::string list();
+    bool edit(data_type::id_type row_id, size_t quantity);
+    data_type::id_type add(data_type::id_type item_id, size_t quantity);
+    bool remove(data_type::id_type row_id) { return edit(row_id, 0); }
+    void checkout();
+    std::string getPriceStr();
+    long long int getPrice();
+  private:
+    data_type::id_type user;
+    std::vector<data_type::item_cart> items;
 };
 
 } // namespace my_user

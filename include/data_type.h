@@ -12,8 +12,10 @@ namespace data_type {
 
 enum class USER_TYPE { CUSTOMER, SELLER };
 enum class ITEM_TYPE { BOOK, FOOD, CLOTHING };
-enum class REQUEST_TYPE { LOGIN, SIGNUP, PASSWD, SEARCH, LIST, ADD_TO_CART, CART_CHECKOUT, 
-  WALLET_SHOW, WALLET_TOPUP, CART_SHOW, ORDERS_SHOW, ORDERS_CANCEL, ORDERS_PAY,
+enum class REQUEST_TYPE { LOGIN, SIGNUP, PASSWD, SEARCH, LIST, 
+  ADD_TO_CART, CART_CHECKOUT, CART_EDIT, CART_REMOVE, CART_SHOW, 
+  WALLET_SHOW, WALLET_TOPUP, 
+  ORDERS_SHOW, ORDERS_CANCEL, ORDERS_PAY,
   SELLER_LIST, SELLER_EDIT, SELLER_ADD, SELLER_REMOVE };
 
 using id_type = unsigned int;
@@ -116,6 +118,7 @@ struct order_data {
 
 
 struct item_cart {
+  id_type row_id;
   id_type item_id;
   id_type user;
   size_t quantity;

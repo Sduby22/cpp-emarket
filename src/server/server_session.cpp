@@ -41,6 +41,12 @@ response_data session::exec(request_data &req) {
     case REQUEST_TYPE::CART_SHOW:
       resp = cart_show(req, vec);
       break;
+    case REQUEST_TYPE::CART_REMOVE:
+      resp = cart_remove(req, vec);
+      break;
+    case REQUEST_TYPE::CART_EDIT:
+      resp = cart_edit(req, vec);
+      break;
     case REQUEST_TYPE::ORDERS_SHOW:
       resp = orders_show(req, vec);
       break;
@@ -131,6 +137,14 @@ session::signup(request_data &req, vector<string> &vec) {
 
 data_type::response_data
 session::add_to_cart(request_data &req, vector<string> &vec) {
+  cart cart(req.user_id);
+  try {
+    size_t quantity = stoul(vec[0]);
+    auto cartid = cart.add(req.target, quantity);
+    return response_data(1, "success, cart row_id "+to_string(cartid));
+  } catch(...) {
+    return response_data(0, "invalid input");
+  }
 }
 
 data_type::response_data
@@ -139,6 +153,29 @@ session::cart_checkout(request_data &req, vector<string> &vec) {
 
 data_type::response_data
 session::cart_show(request_data &req, vector<string> &vec) {
+  cart cart(req.user_id);
+  return response_data(1, cart.list());
+}
+
+response_data session::cart_remove(request_data &req, vector<string> &vec) {
+  cart cart(req.user_id);
+  if (cart.remove(req.target))
+    return response_data(1, "success");
+  else
+    return response_data(0, "invaild input");
+}
+
+response_data session::cart_edit(request_data &req, vector<string> &vec) {
+  cart cart(req.user_id);
+  try {
+    size_t quantity = std::stoul(vec[0]);
+    if (cart.edit(req.target, quantity))
+      return response_data(1, "success");
+    else
+      return response_data(0, "invaild input");
+  } catch (...) {
+    return response_data(0, "invalid input");
+  }
 }
 
 data_type::response_data

@@ -50,6 +50,8 @@ private:
   void add_to_cart(data_type::id_type);
   void cart_checkout();
   void cart_show();
+  void cart_remove(data_type::id_type);
+  void cart_edit(data_type::id_type);
   void wallet_show();
   void wallet_topup(double);
   void orders_show();

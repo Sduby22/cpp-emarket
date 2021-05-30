@@ -60,20 +60,35 @@ std::unique_ptr<cli::Menu> client_session::gen_user_menu() {
                "List all items");
   menu->Insert("add", [&](std::ostream&, data_type::id_type id)
       { add_to_cart(id); }, "Add item to cart", {"item id"});
-  menu->Insert("checkout", [&](std::ostream&)
-      { cart_checkout(); }, "Checkout the shopping cart");
-  menu->Insert("balance", [&](std::ostream&)
-      { wallet_show(); }, "Show wallet balance");
-  menu->Insert("topup", [&](std::ostream&, double x)
-      { wallet_topup(x); }, "Add item to cart", {"Amount"});
-  menu->Insert("orders", [&](std::ostream&)
-      { orders_show(); }, "Show all orders");
-  menu->Insert("cancel", [&](std::ostream&, data_type::id_type id)
-      { orders_cancel(id); }, "Cancel an order", {"order id"});
-  menu->Insert("pay", [&](std::ostream&, data_type::id_type id)
-      { orders_pay(id); }, "Pay an order", {"order id"});
   menu->Insert("passwd", [&](std::ostream&)
       { passwd(); }, "Change the Password");
+
+  auto orders_menu = std::make_unique<cli::Menu>("orders");
+  orders_menu->Insert("list", [&](std::ostream&)
+      { orders_show(); }, "List all orders");
+  orders_menu->Insert("cancel", [&](std::ostream&, data_type::id_type id)
+      { orders_cancel(id); }, "Cancel an order", {"order id"});
+  orders_menu->Insert("pay", [&](std::ostream&, data_type::id_type id)
+      { orders_pay(id); }, "Pay an order", {"order id"});
+  menu->Insert(std::move(orders_menu));
+
+  auto cart_menu = std::make_unique<cli::Menu>("cart");
+  cart_menu->Insert("checkout", [&](std::ostream&)
+      { cart_checkout(); }, "Checkout the shopping cart");
+  cart_menu->Insert("list", [&](std::ostream&)
+      { cart_show(); }, "List cart items");
+  cart_menu->Insert("edit", [&](std::ostream&, data_type::id_type id)
+      { cart_edit(id); }, "Edit cart items", {"row_id"});
+  cart_menu->Insert("remove", [&](std::ostream&, data_type::id_type id)
+      { cart_remove(id); }, "Remove an cart item", {"row_id"});
+  menu->Insert(std::move(cart_menu));
+
+  auto wallet_menu = std::make_unique<cli::Menu>("wallet");
+  wallet_menu->Insert("balance", [&](std::ostream&)
+      { wallet_show(); }, "Show wallet balance");
+  wallet_menu->Insert("topup", [&](std::ostream&, double x)
+      { wallet_topup(x); }, "Add item to cart", {"Amount"});
+  menu->Insert(std::move(wallet_menu));
 
   auto seller_menu = std::make_unique<cli::Menu>("seller");
   seller_menu->Insert("list", [&](std::ostream&)
@@ -165,7 +180,11 @@ void client_session::passwd() {
 }
 
 void client_session::add_to_cart(data_type::id_type id) {
-
+  string quantity;
+  cout << "how many to add to cart: ";
+  getline(cin, quantity);
+  request_data req(REQUEST_TYPE::ADD_TO_CART, current_user, id, quantity);
+  auto resp = feed(req);
 }
 
 void client_session::cart_checkout() {
@@ -173,7 +192,21 @@ void client_session::cart_checkout() {
 }
 
 void client_session::cart_show() {
+  request_data req(REQUEST_TYPE::CART_SHOW, current_user, 0);
+  auto resp = feed(req);
+}
 
+void client_session::cart_edit(id_type id) {
+  string quantity;
+  cout << "new quantity: ";
+  getline(cin, quantity);
+  auto req = request_data(REQUEST_TYPE::CART_EDIT, current_user, id, quantity);
+  auto resp = feed(req);
+}
+
+void client_session::cart_remove(id_type id) {
+  auto req = request_data(REQUEST_TYPE::CART_REMOVE, current_user, id);
+  auto resp = feed(req);
 }
 
 void client_session::wallet_show() {
