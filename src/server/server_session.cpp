@@ -89,6 +89,9 @@ response_data session::exec(request_data &req) {
     case REQUEST_TYPE::WALLET_TOPUP:
       resp = wallet_topup(req, vec);
       break;
+    case REQUEST_TYPE::SELLER_SALE:
+      resp = seller_sale(req, vec);
+      break;
     default:
       resp.success = false;
       resp.payload = "unknown error";
@@ -149,6 +152,11 @@ session::add_to_cart(request_data &req, vector<string> &vec) {
 
 data_type::response_data
 session::cart_checkout(request_data &req, vector<string> &vec) {
+  cart cart(req.user_id);
+  if (cart.checkout())
+    return response_data(1, "create order success");
+  else
+    return response_data(1, "some orders are not able to be created, for insufficient stock");
 }
 
 data_type::response_data
@@ -180,14 +188,35 @@ response_data session::cart_edit(request_data &req, vector<string> &vec) {
 
 data_type::response_data
 session::orders_show(request_data &req, vector<string> &vec) {
+  auto orders = order::get_user_orders(req.user_id);
+  string msg = "id\titem name\tquantity\tprice\n";
+  for (auto &order: orders) {
+    msg+=order.to_string()+"\n";
+  }
+  return response_data(1, msg);
 }
 
 data_type::response_data
 session::orders_pay(request_data &req, vector<string> &vec) {
+  auto order = order::get(req.target);
+  if (order->pay()) {
+    auto user = base_user::get(req.user_id);
+    return response_data(1, "success paid " + order->get_price()  
+                              + "$ balance " + user->get_balance() + "$");
+  }
+  else
+    return response_data(0, "insufficient balance");
 }
 
 data_type::response_data
 session::orders_cancel(request_data &req, vector<string> &vec) {
+  auto order = order::get(req.target);
+  if (order) {
+    order->cancel();
+    return response_data(1, "success");
+  } else {
+    return response_data(0, "order not found");
+  }
 }
 
 data_type::response_data
@@ -261,6 +290,11 @@ session::seller_remove(request_data &req, vector<string> &vec) {
   auto item = base_item::get(req.target);
   item->remove();
   return response_data(1, "success");
+}
+
+data_type::response_data
+session::seller_sale(request_data &req, vector<string> &vec) {
+
 }
 
 data_type::response_data

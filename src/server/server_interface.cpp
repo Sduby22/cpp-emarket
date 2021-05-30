@@ -105,6 +105,17 @@ auto storage = make_storage(
     return item_vec;
   }
 
+  std::vector<std::unique_ptr<base_item>> 
+  base_item::get_all(data_type::id_type id, data_type::ITEM_TYPE type) {
+    vector<unique_ptr<base_item>> item_vec;
+    for (auto &item: storage.iterate<item_data>
+            (where(c(&item_data::seller) == id 
+               and c(&item_data::type) == int(type)))) {
+      item_vec.push_back(get_ptr_from_data(item));
+    }
+    return item_vec;
+  }
+
   vector<unique_ptr<base_item>> base_item::query(const string &str) {
     vector<unique_ptr<base_item>> vec;
     if (!str.empty()) {
@@ -241,8 +252,20 @@ auto storage = make_storage(
     }
   }
 
-  void cart::checkout() {
-    
+  bool cart::checkout() {
+    bool all_success = true;
+    for (auto &item: items) {
+      auto itemp = base_item::get(item.item_id);
+      order_data data{0, item.item_id, item.quantity, user,
+              itemp->get_seller(), itemp->getPrice()*item.quantity};
+      order order(data);
+      if (order.create()) {
+        remove(item.row_id);
+      } else {
+        all_success = false;
+      }
+    }
+    return all_success;
   }
   
   long long int cart::getPrice() {
@@ -280,4 +303,75 @@ auto storage = make_storage(
     res += "total: " + getPriceStr() + "$\n";
     return res;
   }
+
+  std::unique_ptr<order> order::get(data_type::id_type id) {
+    auto ptr = storage.get_pointer<order_data>(id);
+    if (ptr)
+      return make_unique<order>(*ptr);
+    else
+      return nullptr;
+  }
+
+  id_type order::create() {
+    auto item = base_item::get(data.item_id);
+    if (item->available_stock() >= data.quantity) {
+      item->froze(data.quantity);
+      return storage.insert<order_data>(data);
+    } else return 0;
+  }
+
+  bool order::pay() {
+    auto customer = base_user::get(data.customer);
+    auto seller = base_user::get(data.seller);
+    auto item = base_item::get(data.item_id);
+    if (customer->pay(data.price)) {
+      seller->topup(data.price);
+      item->sold(data.quantity);
+      cancel();
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  void order::cancel() {
+    auto item = base_item::get(data.item_id);
+    item->unfroze(data.quantity);
+    storage.remove<order_data>(data.id);
+  }
+
+  std::string order::get_price() const {
+    string price = std::to_string(data.price);
+    switch (price.length()) {
+      case 1:
+        price.insert(0, "0.0");
+        break;
+      case 2:
+        price.insert(0, "0.");
+        break;
+      default:
+        price.insert(price.end()-2, '.');
+    }
+    return price;
+  }
+
+  std::string order::to_string() const {
+    string msg;
+    auto item = base_item::get(data.item_id);
+    msg += std::to_string(data.id) + "\t"
+        +  item->get_name() + "\t"
+        +  std::to_string(data.quantity) + "\t"
+        +  get_price() + "$";
+    return msg;
+  }
+
+  std::vector<order> order::get_user_orders(data_type::id_type user_id) {
+    vector<order> vec;
+    for (auto &item: storage.iterate<order_data>
+                            (where(c(&order_data::customer) == user_id))) {
+      vec.emplace_back(item);
+    }
+    return vec;
+  }
+
   } // namespace my_user

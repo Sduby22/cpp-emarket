@@ -32,7 +32,13 @@ public:
       return str;
     }
   void topup(long long int x) { user->balance += x; update(); };
-  void pay(long long int x) { user->balance -= x; update(); }
+  bool pay(long long int x) { 
+    if (user->balance < x)
+      return false;
+    user->balance -= x; 
+    update();
+    return true;
+  }
 private:
   std::unique_ptr<data_type::user_data> user;
 };
@@ -57,11 +63,13 @@ class base_item {
 public:
   static std::unique_ptr<base_item> get(data_type::id_type id);
   static std::vector<std::unique_ptr<base_item>> get_all(data_type::id_type);
+  static std::vector<std::unique_ptr<base_item>> 
+    get_all(data_type::id_type, data_type::ITEM_TYPE);
   static std::vector<std::unique_ptr<base_item>> query(const std::string &str);
   using ITEM_TYPE = data_type::ITEM_TYPE;
   base_item(std::unique_ptr<data_type::item_data> &&ptr)
     : item(std::move(ptr)) {}
-  virtual long long int getPrice() { 
+  virtual unsigned long long int getPrice() { 
     return static_cast<long long int>(item->price * item->discount); 
   };
   virtual std::string getPriceStr() { 
@@ -83,7 +91,13 @@ public:
   data_type::id_type insert();
   std::string to_string();
   std::string get_name() const { return item->name; };
+  data_type::id_type get_seller() const { return item->seller; }
   bool edit(std::vector<std::string> &vec);
+  void sold(size_t amount) { item->stock -= amount; update();}
+  void froze(size_t amount) { item->frozen += amount; update(); }
+  void unfroze(size_t amount) { item->frozen -= amount; update(); }
+  size_t available_stock() { return item->stock - item->frozen; }
+  void sale(double x) { item->discount = x; update(); }
   void remove();
 private:
   std::string get_type() const;
@@ -123,12 +137,26 @@ class cart {
     bool edit(data_type::id_type row_id, size_t quantity);
     data_type::id_type add(data_type::id_type item_id, size_t quantity);
     bool remove(data_type::id_type row_id) { return edit(row_id, 0); }
-    void checkout();
+    bool checkout();
     std::string getPriceStr();
     long long int getPrice();
   private:
     data_type::id_type user;
     std::vector<data_type::item_cart> items;
+};
+
+class order {
+  public:
+    static std::vector<order> get_user_orders(data_type::id_type);
+    static std::unique_ptr<order> get(data_type::id_type);
+    order(const data_type::order_data &order): data(order) {}
+    bool pay();
+    void cancel();
+    data_type::id_type create();
+    std::string to_string() const;
+    std::string get_price() const;
+  private:
+    data_type::order_data data;
 };
 
 } // namespace my_user

@@ -188,7 +188,8 @@ void client_session::add_to_cart(data_type::id_type id) {
 }
 
 void client_session::cart_checkout() {
-
+  request_data req(REQUEST_TYPE::CART_CHECKOUT, current_user, 0);
+  auto resp = feed(req);
 }
 
 void client_session::cart_show() {
@@ -222,15 +223,18 @@ void client_session::wallet_topup(double x) {
 }
 
 void client_session::orders_show() {
-
+  request_data req(REQUEST_TYPE::ORDERS_SHOW, current_user, 0);
+  auto resp = feed(req);
 }
 
 void client_session::orders_cancel(data_type::id_type id) {
-
+  request_data req(REQUEST_TYPE::ORDERS_CANCEL, current_user, id);
+  auto resp = feed(req);
 }
 
 void client_session::orders_pay(data_type::id_type id) {
-
+  request_data req(REQUEST_TYPE::ORDERS_PAY, current_user, id);
+  auto resp = feed(req);
 }
 
 void client_session::seller_list() {

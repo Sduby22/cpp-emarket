@@ -51,6 +51,8 @@ namespace server_session {
     static data_type::response_data
     seller_remove(data_type::request_data &req, std::vector<std::string> &vec);
     static data_type::response_data
+    seller_sale(data_type::request_data &req, std::vector<std::string> &vec);
+    static data_type::response_data
     wallet_show(data_type::request_data &req, std::vector<std::string> &vec);
     static data_type::response_data
     wallet_topup(data_type::request_data &req, std::vector<std::string> &vec);

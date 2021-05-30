@@ -16,7 +16,7 @@ enum class REQUEST_TYPE { LOGIN, SIGNUP, PASSWD, SEARCH, LIST,
   ADD_TO_CART, CART_CHECKOUT, CART_EDIT, CART_REMOVE, CART_SHOW, 
   WALLET_SHOW, WALLET_TOPUP, 
   ORDERS_SHOW, ORDERS_CANCEL, ORDERS_PAY,
-  SELLER_LIST, SELLER_EDIT, SELLER_ADD, SELLER_REMOVE };
+  SELLER_LIST, SELLER_EDIT, SELLER_ADD, SELLER_REMOVE, SELLER_SALE };
 
 using id_type = unsigned int;
 
@@ -113,7 +113,7 @@ struct order_data {
   size_t quantity;
   id_type customer;
   id_type seller;
-  long long int price;
+  unsigned long long int price;
 };
 
 
