@@ -207,10 +207,17 @@ session::seller_list(request_data &req, vector<string> &vec) {
 
 data_type::response_data
 session::wallet_show(request_data &req, vector<string> &vec) {
+  auto user = base_user::get(req.user_id);
+  auto msg = "balance: " + user->get_balance() + "$\n";
+  return response_data(1, msg);
 }
 
 data_type::response_data
 session::wallet_topup(request_data &req, vector<string> &vec) {
+  auto user = base_user::get(req.user_id);
+  user->topup(stoll(vec[0]));
+  response_data resp(1, "success! balance: "+user->get_balance() + "$\n");
+  return resp;
 }
 
 } // namespace server_session

@@ -174,11 +174,15 @@ void client_session::cart_show() {
 }
 
 void client_session::wallet_show() {
-
+  request_data req(REQUEST_TYPE::WALLET_SHOW, current_user, 0);
+  auto resp = feed(req);
 }
 
 void client_session::wallet_topup(double x) {
-
+  int64 amount = x*100;
+  request_data req(REQUEST_TYPE::WALLET_TOPUP, current_user, 
+                    0, to_string(amount));
+  auto resp = feed(req);
 }
 
 void client_session::orders_show() {

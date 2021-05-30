@@ -24,7 +24,14 @@ public:
   void changePass(const std::string &pass) { user->passwd = pass; update(); } 
   data_type::id_type get_id() const { return user->id; };
   std::string get_name() const {return user->name;};
-  std::string get_balance() const {return std::to_string(user->balance / 100);}
+  std::string get_balance() const 
+    {
+      auto str = std::to_string(user->balance / 100.00);
+      str.resize(str.length()-4);
+      return str;
+    }
+  void topup(long long int x) { user->balance += x; update(); };
+  void pay(long long int x) { user->balance -= x; update(); }
 private:
   std::unique_ptr<data_type::user_data> user;
 };
@@ -58,8 +65,16 @@ public:
   };
   virtual std::string getPriceStr() { 
     auto pricestr = std::to_string(getPrice());
-    if (pricestr.length() > 2)
-      pricestr.insert(pricestr.end()-2, '.');
+    switch (pricestr.length()) {
+      case 1:
+        pricestr.insert(0, "0.0");
+        break;
+      case 2:
+        pricestr.insert(0, "0.");
+        break;
+      default:
+        pricestr.insert(pricestr.end()-2, '.');
+    }
     return pricestr;
   }
   virtual ~base_item() {}
