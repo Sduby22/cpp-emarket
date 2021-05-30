@@ -99,6 +99,8 @@ std::unique_ptr<cli::Menu> client_session::gen_user_menu() {
       {seller_add();}, "Add an item to sell");
   seller_menu->Insert("remove", [&](std::ostream&, data_type::id_type id)
       {seller_remove(id);}, "Remove a selling item", {"item id"});
+  seller_menu->Insert("sale", [&](std::ostream&)
+      {seller_sale();}, "Sale items of a specific type");
   menu->Insert(std::move(seller_menu));
   return menu;
 }
@@ -296,6 +298,17 @@ void client_session::seller_add() {
 
 void client_session::seller_remove(id_type id) {
   auto resp = feed(request_data(REQUEST_TYPE::SELLER_REMOVE, current_user, id));
+}
+
+void client_session::seller_sale() {
+  string type, discount;
+  cout << "select an item type: book(0), food(1), clothing(2): " << endl;
+  getline(cin, type);
+  cout << "input your discount (0.8 for -20% off): " << endl;
+  getline(cin, discount);
+  request_data req(REQUEST_TYPE::SELLER_SALE, current_user, 0, 
+                    base_data::join({type, discount}));
+  auto resp = feed(req);
 }
 
 } // namespace client

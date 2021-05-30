@@ -61,6 +61,7 @@ private:
   void seller_edit(data_type::id_type);
   void seller_add();
   void seller_remove(data_type::id_type);
+  void seller_sale();
 };
 
 }

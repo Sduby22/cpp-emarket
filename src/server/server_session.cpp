@@ -294,7 +294,19 @@ session::seller_remove(request_data &req, vector<string> &vec) {
 
 data_type::response_data
 session::seller_sale(request_data &req, vector<string> &vec) {
-
+  int type;
+  double discount;
+  try {
+    type = stoi(vec[0]);
+    discount = stod(vec[1]);
+  } catch(...) {
+    return response_data(0, "invalid input");
+  }
+  auto items = base_item::get_all(req.user_id, ITEM_TYPE(type));
+  for (auto &item: items) {
+    item->sale(discount);
+  }
+  return response_data(1, "success");
 }
 
 data_type::response_data
