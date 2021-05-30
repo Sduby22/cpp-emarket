@@ -55,7 +55,7 @@ public:
 class base_item {
 public:
   static std::unique_ptr<base_item> get(data_type::id_type id);
-  static std::vector<std::unique_ptr<base_item>> get_all();
+  static std::vector<std::unique_ptr<base_item>> get_all(data_type::id_type);
   static std::vector<std::unique_ptr<base_item>> query(const std::string &str);
   using ITEM_TYPE = data_type::ITEM_TYPE;
   base_item(std::unique_ptr<data_type::item_data> &&ptr)
@@ -81,6 +81,7 @@ public:
   void update();
   data_type::id_type insert();
   std::string to_string();
+  bool edit(std::vector<std::string> &vec);
 private:
   std::string get_type() const;
   static std::unique_ptr<base_item> get_ptr_from_data(data_type::item_data);

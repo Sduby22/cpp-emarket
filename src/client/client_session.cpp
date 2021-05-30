@@ -198,11 +198,35 @@ void client_session::orders_pay(data_type::id_type id) {
 }
 
 void client_session::seller_list() {
-
+  request_data req(REQUEST_TYPE::SELLER_LIST, current_user, 0);
+  auto resp = feed(req);
 }
 
 void client_session::seller_edit(data_type::id_type id) {
-
+  string name,description,price_str,type_str,stock;
+  double price;
+  int type;
+  cout << "input new name (default unchange): ";
+  getline(cin, name);
+  cout << "input new description (default unchange): ";
+  getline(cin, description);
+  cout << "input new price (default unchange): ";
+  getline(cin, price_str);
+  cout << "input new type book(0), food(1), clothing(2) (default unchange): ";
+  getline(cin, type_str);
+  cout << "input stock: ";
+  getline(cin, stock);
+  try {
+    type = stoi(type_str);
+    price = stod(price_str);
+  } catch(...) {
+    cout << "error: invalid input" << endl;
+    return;
+  }
+  request_data req(REQUEST_TYPE::SELLER_EDIT, current_user, id
+    , base_data::join({name, description, to_string(int64(price*100)), 
+                        to_string(type), stock}));
+  auto resp = feed(req);
 }
 
 void client_session::seller_add() {

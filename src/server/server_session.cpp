@@ -199,10 +199,21 @@ session::seller_add(request_data &req, vector<string> &vec) {
 
 data_type::response_data
 session::seller_edit(request_data &req, vector<string> &vec) {
+  auto item = base_item::get(req.target);
+  if(item->edit(vec))
+    return response_data(1, "success");
+  else
+    return response_data(0, "invalid input");
 }
 
 data_type::response_data
 session::seller_list(request_data &req, vector<string> &vec) {
+  auto list = base_item::get_all(req.user_id);
+  string msg;
+  for (auto &item: list) {
+    msg += item->to_string() + "\n\n"; 
+  }
+  return response_data(1, msg);
 }
 
 data_type::response_data

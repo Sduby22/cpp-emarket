@@ -93,9 +93,10 @@ auto storage = make_storage(
     return nullptr;
   }
 
-  std::vector<unique_ptr<base_item>> base_item::get_all() {
+  std::vector<unique_ptr<base_item>> base_item::get_all(id_type seller) {
     vector<unique_ptr<base_item>> item_vec;
-    for (auto &item: storage.iterate<item_data>()) {
+    for (auto &item: storage.iterate<item_data>
+            (where(c(&item_data::seller) == seller))) {
       item_vec.push_back(get_ptr_from_data(item));
     }
     return item_vec;
@@ -172,4 +173,32 @@ auto storage = make_storage(
     }
   }
 
+  bool base_item::edit(std::vector<std::string> &vec) {
+    try {
+      if (!vec[0].empty()) {
+        // name
+        item->name = vec[0];
+      }
+      if (!vec[1].empty()) {
+        // description
+        item->description = vec[1];
+      }
+      if (!vec[2].empty()) {
+        // price
+        item->price = std::stoll(vec[2]);
+      }
+      if (!vec[3].empty()) {
+        // type
+        item->type = std::stoi(vec[3]);
+      }
+      if (!vec[4].empty()) {
+        // stock
+        item->stock = std::stoi(vec[3]);
+      }
+    } catch (...) {
+      return false;
+    }
+    update();
+    return true;
+  }
   } // namespace my_user
