@@ -146,6 +146,7 @@ auto storage = make_storage(
 
   string base_item::to_string() {
     string res;
+    res += "id: " + std::to_string(item->id) + "\n";
     res += item->name + "\n";
     res += getPriceStr() + "$";
     res += item->discount == 1 ? "\n" : " (now "

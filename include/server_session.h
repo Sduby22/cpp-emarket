@@ -33,6 +33,8 @@ namespace server_session {
     static data_type::response_data
     list(data_type::request_data &req, std::vector<std::string> &vec);
     static data_type::response_data
+    search(data_type::request_data &req, std::vector<std::string> &vec);
+    static data_type::response_data
     passwd(data_type::request_data &req, std::vector<std::string> &vec);
     static data_type::response_data
     seller_add(data_type::request_data &req, std::vector<std::string> &vec);

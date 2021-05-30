@@ -141,7 +141,8 @@ void client_session::login(std::string &asd) {
 }
 
 void client_session::search(string &str) {
-  
+  request_data req(REQUEST_TYPE::SEARCH, str);
+  auto resp = feed(req);
 }
 
 void client_session::list() {

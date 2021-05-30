@@ -53,6 +53,9 @@ response_data session::exec(request_data &req) {
     case REQUEST_TYPE::LIST:
       resp = list(req, vec);
       break;
+    case REQUEST_TYPE::SEARCH:
+      resp = search(req, vec);
+      break;
     case REQUEST_TYPE::LOGIN:
       resp = login(req, vec);
       break;
@@ -158,6 +161,16 @@ session::list(request_data &req, vector<string> &vec) {
 }
 
 data_type::response_data
+session::search(request_data &req, vector<string> &vec) {
+  auto list = base_item::query(vec[0]);
+  string msg;
+  for (auto &item: list) {
+    msg += item->to_string() + "\n\n";
+  }
+  return response_data(1, msg);
+}
+
+data_type::response_data
 session::passwd(request_data &req, vector<string> &vec) {
   auto user = base_user::get(req.user_id);
   if (!user)
@@ -171,8 +184,10 @@ session::passwd(request_data &req, vector<string> &vec) {
 
 data_type::response_data
 session::seller_add(request_data &req, vector<string> &vec) {
-  string& name = vec[0];
-  string& description = vec[1];
+  string name = vec[0];
+  string description = vec[1];
+  if (name.empty()) name = "item";
+  if (description.empty()) description = "No description.";
   int type = req.target;
   long long int price = std::stoll(vec[2]);
   unique_ptr<item_data> data
