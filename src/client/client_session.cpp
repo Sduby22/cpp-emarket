@@ -8,6 +8,7 @@
 
 using namespace std;
 using data_type::base_data;
+using data_type::id_type;
 using data_type::request_data;
 using data_type::response_data;
 using data_type::REQUEST_TYPE;
@@ -81,6 +82,8 @@ std::unique_ptr<cli::Menu> client_session::gen_user_menu() {
       {seller_edit(id);}, "Edit a selling item", {"item id"});
   seller_menu->Insert("add", [&](std::ostream&)
       {seller_add();}, "Add an item to sell");
+  seller_menu->Insert("remove", [&](std::ostream&, data_type::id_type id)
+      {seller_remove(id);}, "Remove a selling item", {"item id"});
   menu->Insert(std::move(seller_menu));
   return menu;
 }
@@ -217,14 +220,15 @@ void client_session::seller_edit(data_type::id_type id) {
   cout << "input stock: ";
   getline(cin, stock);
   try {
-    type = stoi(type_str);
-    price = stod(price_str);
+    if (!price_str.empty())
+      price = stod(price_str);
   } catch(...) {
     cout << "error: invalid input" << endl;
     return;
   }
   request_data req(REQUEST_TYPE::SELLER_EDIT, current_user, id
-    , base_data::join({name, description, to_string(int64(price*100)), 
+    , base_data::join({name, description, 
+      price_str.empty() ? "" : to_string(int64(price*100)), 
                         to_string(type), stock}));
   auto resp = feed(req);
 }
@@ -251,6 +255,10 @@ void client_session::seller_add() {
   request_data req(REQUEST_TYPE::SELLER_ADD, current_user, type
     , base_data::join({name, description, to_string(int64(price*100))}));
   auto resp = feed(req);
+}
+
+void client_session::seller_remove(id_type id) {
+  auto resp = feed(request_data(REQUEST_TYPE::SELLER_REMOVE, current_user, id));
 }
 
 } // namespace client

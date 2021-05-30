@@ -82,6 +82,7 @@ public:
   data_type::id_type insert();
   std::string to_string();
   bool edit(std::vector<std::string> &vec);
+  void remove();
 private:
   std::string get_type() const;
   static std::unique_ptr<base_item> get_ptr_from_data(data_type::item_data);

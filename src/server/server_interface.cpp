@@ -193,7 +193,7 @@ auto storage = make_storage(
       }
       if (!vec[4].empty()) {
         // stock
-        item->stock = std::stoi(vec[3]);
+        item->stock = std::stoi(vec[4]);
       }
     } catch (...) {
       return false;
@@ -201,4 +201,6 @@ auto storage = make_storage(
     update();
     return true;
   }
+
+  void base_item::remove() { storage.remove<item_data>(item->id); }
   } // namespace my_user

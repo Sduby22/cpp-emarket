@@ -74,6 +74,9 @@ response_data session::exec(request_data &req) {
     case REQUEST_TYPE::SELLER_LIST:
       resp = seller_list(req, vec);
       break;
+    case REQUEST_TYPE::SELLER_REMOVE:
+      resp = seller_remove(req, vec);
+      break;
     case REQUEST_TYPE::WALLET_SHOW:
       resp = wallet_show(req, vec);
       break;
@@ -214,6 +217,13 @@ session::seller_list(request_data &req, vector<string> &vec) {
     msg += item->to_string() + "\n\n"; 
   }
   return response_data(1, msg);
+}
+
+data_type::response_data
+session::seller_remove(request_data &req, vector<string> &vec) {
+  auto item = base_item::get(req.target);
+  item->remove();
+  return response_data(1, "success");
 }
 
 data_type::response_data
