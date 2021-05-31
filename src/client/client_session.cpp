@@ -27,7 +27,15 @@ client_session::feed(const data_type::request_data &req) {
     req.send(conn);
     resp.recv(conn);
   }
+
+#ifdef DEBUG
   std::cout << resp.dump() << std::endl;
+#else
+  if (!resp.success)
+    std::cout << "error: ";
+  std::cout << resp.payload << std::endl;
+#endif
+
   conn.close();
   return resp;
 }
