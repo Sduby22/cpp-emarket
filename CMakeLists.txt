@@ -14,6 +14,17 @@ include_directories(./include)
 
 include(GNUInstallDirs)
 
+option(BUILD_DOC "Build Doxygen" ON)
+find_package(Doxygen
+             REQUIRED dot
+             OPTIONAL_COMPONENTS mscgen dia)
+
+if(BUILD_DOC AND DOXYGEN_FOUND)
+  add_subdirectory(doc)
+else()
+  message("Needs doxygen installed to generate documentation")
+endif()
+
 if(WIN32)
   set(SQLite3_INCLUDE_DIRS ./sqlite3/include)
   set(SQLite3_LIBRARY ./sqlite3/lib)
