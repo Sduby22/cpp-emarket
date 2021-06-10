@@ -1,22 +1,37 @@
 #ifndef DATA_TYPE_H_WXRDIQC3
 #define DATA_TYPE_H_WXRDIQC3
 
-
+#include "sockpp/stream_socket.h"
 #include <string>
 #include <utility>
 #include <vector>
-#include "sockpp/stream_socket.h"
 
 namespace data_type {
 
-
 enum class USER_TYPE { CUSTOMER, SELLER };
 enum class ITEM_TYPE { BOOK, FOOD, CLOTHING };
-enum class REQUEST_TYPE { LOGIN, SIGNUP, PASSWD, SEARCH, LIST, 
-  ADD_TO_CART, CART_CHECKOUT, CART_EDIT, CART_REMOVE, CART_SHOW, 
-  WALLET_SHOW, WALLET_TOPUP, 
-  ORDERS_SHOW, ORDERS_CANCEL, ORDERS_PAY,
-  SELLER_LIST, SELLER_EDIT, SELLER_ADD, SELLER_REMOVE, SELLER_SALE };
+enum class REQUEST_TYPE {
+  LOGIN,
+  SIGNUP,
+  PASSWD,
+  SEARCH,
+  LIST,
+  ADD_TO_CART,
+  CART_CHECKOUT,
+  CART_EDIT,
+  CART_REMOVE,
+  CART_SHOW,
+  WALLET_SHOW,
+  WALLET_TOPUP,
+  ORDERS_SHOW,
+  ORDERS_CANCEL,
+  ORDERS_PAY,
+  SELLER_LIST,
+  SELLER_EDIT,
+  SELLER_ADD,
+  SELLER_REMOVE,
+  SELLER_SALE
+};
 
 using id_type = unsigned int;
 
@@ -24,39 +39,35 @@ struct base_data {
   virtual ssize_t send(sockpp::stream_socket &socket) const = 0;
   virtual ssize_t recv(sockpp::stream_socket &socket) = 0;
 
-  template<typename T>
-  static ssize_t write(sockpp::stream_socket &sock, const T& buf);
-  
-  template<typename T>
-  static ssize_t read(sockpp::stream_socket &sock, T& buf);
+  template <typename T>
+  static ssize_t write(sockpp::stream_socket &sock, const T &buf);
 
-  static std::vector<std::string> split(const std::string &str, char=27);
-  static std::string join(const std::vector<std::string> &vec, char=27);
-  
+  template <typename T>
+  static ssize_t read(sockpp::stream_socket &sock, T &buf);
+
+  static std::vector<std::string> split(const std::string &str, char = 27);
+  static std::string join(const std::vector<std::string> &vec, char = 27);
+
   virtual std::string dump() const = 0;
 
-  virtual ~base_data() {};
+  virtual ~base_data(){};
 };
 
-struct request_data: base_data {
+struct request_data : base_data {
 
   virtual ssize_t send(sockpp::stream_socket &socket) const override;
   virtual ssize_t recv(sockpp::stream_socket &socket) override;
   virtual std::string dump() const override;
 
   request_data(REQUEST_TYPE type, id_type user_id, id_type target)
-    : type(type), user_id(user_id), target(target)
-  {}
+      : type(type), user_id(user_id), target(target) {}
 
   request_data(REQUEST_TYPE type, std::string payload1)
-    : type(type), payload(payload1), user_id(0), target(0)
-  {}
+      : type(type), payload(payload1), user_id(0), target(0) {}
 
   request_data(REQUEST_TYPE type, id_type user_id, id_type target,
                std::string payload1)
-    : type(type), user_id(user_id), target(target), 
-      payload(payload1)
-  {}
+      : type(type), user_id(user_id), target(target), payload(payload1) {}
 
   request_data() {}
 
@@ -64,20 +75,18 @@ struct request_data: base_data {
   id_type user_id;
   id_type target;
   std::string payload;
-
 };
 
-
-struct response_data: base_data {
+struct response_data : base_data {
   virtual ssize_t send(sockpp::stream_socket &socket) const override;
   virtual ssize_t recv(sockpp::stream_socket &socket) override;
   virtual std::string dump() const override;
 
   response_data(int success, id_type user_id, std::string msg)
-    : success(success), user_id(user_id), payload(msg) {}
+      : success(success), user_id(user_id), payload(msg) {}
 
   response_data(int success, std::string msg)
-    : success(success), payload(msg), user_id(0) {}
+      : success(success), payload(msg), user_id(0) {}
 
   response_data() {}
 
@@ -86,7 +95,6 @@ struct response_data: base_data {
   std::string payload;
 };
 
-
 struct user_data {
   id_type id;
   long long int balance; // Unit: 分
@@ -94,7 +102,6 @@ struct user_data {
   std::string name;
   std::string passwd;
 };
-
 
 struct item_data {
   id_type id;
@@ -108,7 +115,6 @@ struct item_data {
   std::string name;
 };
 
-
 struct order_data {
   id_type id;
   id_type item_id;
@@ -118,7 +124,6 @@ struct order_data {
   unsigned long long int price;
 };
 
-
 struct item_cart {
   id_type row_id;
   id_type item_id;
@@ -126,6 +131,6 @@ struct item_cart {
   size_t quantity;
 };
 
-} // namespace data
+} // namespace data_type
 
 #endif /* end of include guard: DATA_TYPE_H_WXRDIQC3 */

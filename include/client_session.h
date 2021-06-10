@@ -1,10 +1,9 @@
 #ifndef CLIENT_SESSION_H_NMCR7SJP
 #define CLIENT_SESSION_H_NMCR7SJP
 
-
 #include "cli/cli.h"
-#include "data_type.h"
 #include "cli/clifilesession.h"
+#include "data_type.h"
 #include "sockpp/tcp_connector.h"
 #include <memory>
 #include <string>
@@ -16,22 +15,23 @@ class client_session;
 class cli_session {
 public:
   friend class client_session;
-  cli_session(std::unique_ptr<cli::Menu> menu): cli(std::move(menu)), session(cli) {}
+  cli_session(std::unique_ptr<cli::Menu> menu)
+      : cli(std::move(menu)), session(cli) {}
   void Start() { session.Start(); }
   void Exit() { session.Exit(); }
+
 private:
   cli::Cli cli;
   cli::CliFileSession session;
 };
 
-
 class client_session {
 
 public:
-  client_session(std::string="localhost", unsigned=12345);
+  client_session(std::string = "localhost", unsigned = 12345);
   data_type::response_data feed(const data_type::request_data &req);
   void Start() { session->Start(); }
-  bool logged_in() const { return current_user!=0; };
+  bool logged_in() const { return current_user != 0; };
 
 private:
   std::unique_ptr<cli::Menu> gen_main_menu();
@@ -42,9 +42,9 @@ private:
   std::string host;
 
   void logout();
-  void login(std::string&);
-  void signup(std::string&);
-  void search(std::string&);
+  void login(std::string &);
+  void signup(std::string &);
+  void search(std::string &);
   void list();
   void passwd();
   void add_to_cart(data_type::id_type);
@@ -64,7 +64,6 @@ private:
   void seller_sale();
 };
 
-}
-
+} // namespace client
 
 #endif /* end of include guard: CLIENT_SESSION_H_NMCR7SJP */

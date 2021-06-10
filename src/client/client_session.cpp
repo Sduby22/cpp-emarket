@@ -10,17 +10,17 @@ using namespace std;
 using data_type::base_data;
 using data_type::id_type;
 using data_type::request_data;
-using data_type::response_data;
 using data_type::REQUEST_TYPE;
+using data_type::response_data;
 
 namespace client {
 
 typedef long long int int64;
-data_type::response_data 
+data_type::response_data
 client_session::feed(const data_type::request_data &req) {
   sockpp::tcp_connector conn;
   response_data resp;
-  if(!conn.connect(sockpp::inet_address(host, port))) {
+  if (!conn.connect(sockpp::inet_address(host, port))) {
     std::cerr << "failed to connect..." << std::endl;
     resp.success = 0;
   } else {
@@ -40,8 +40,8 @@ client_session::feed(const data_type::request_data &req) {
   return resp;
 }
 
-client_session::client_session(string host, unsigned port) 
-  : current_user(0), host(host), port(port) {
+client_session::client_session(string host, unsigned port)
+    : current_user(0), host(host), port(port) {
   session = std::make_unique<cli_session>(gen_main_menu());
 }
 
@@ -54,61 +54,73 @@ std::unique_ptr<cli::Menu> client_session::gen_main_menu() {
                "Sign Up", {"username"});
   menu->Insert("search", [&](std::ostream &, string str) { search(str); },
                "Sign Up", {"item name"});
-  menu->Insert("list", [&](std::ostream &) { list(); },
-               "List all items");
+  menu->Insert(
+      "list", [&](std::ostream &) { list(); }, "List all items");
   return menu;
 }
 
 std::unique_ptr<cli::Menu> client_session::gen_user_menu() {
   auto menu = std::make_unique<cli::Menu>("main");
-  menu->Insert("logout", [&](std::ostream&){ logout(); });
+  menu->Insert("logout", [&](std::ostream &) { logout(); });
   menu->Insert("search", [&](std::ostream &, string str) { search(str); },
                "Search for items", {"item name"});
-  menu->Insert("list", [&](std::ostream &) { list(); },
-               "List all items");
-  menu->Insert("add", [&](std::ostream&, data_type::id_type id)
-      { add_to_cart(id); }, "Add item to cart", {"item id"});
-  menu->Insert("passwd", [&](std::ostream&)
-      { passwd(); }, "Change the Password");
+  menu->Insert(
+      "list", [&](std::ostream &) { list(); }, "List all items");
+  menu->Insert("add",
+               [&](std::ostream &, data_type::id_type id) { add_to_cart(id); },
+               "Add item to cart", {"item id"});
+  menu->Insert(
+      "passwd", [&](std::ostream &) { passwd(); }, "Change the Password");
 
   auto orders_menu = std::make_unique<cli::Menu>("orders");
-  orders_menu->Insert("list", [&](std::ostream&)
-      { orders_show(); }, "List all orders");
-  orders_menu->Insert("cancel", [&](std::ostream&, data_type::id_type id)
-      { orders_cancel(id); }, "Cancel an order", {"order id"});
-  orders_menu->Insert("pay", [&](std::ostream&, data_type::id_type id)
-      { orders_pay(id); }, "Pay an order", {"order id"});
+  orders_menu->Insert(
+      "list", [&](std::ostream &) { orders_show(); }, "List all orders");
+  orders_menu->Insert(
+      "cancel",
+      [&](std::ostream &, data_type::id_type id) { orders_cancel(id); },
+      "Cancel an order", {"order id"});
+  orders_menu->Insert(
+      "pay", [&](std::ostream &, data_type::id_type id) { orders_pay(id); },
+      "Pay an order", {"order id"});
   menu->Insert(std::move(orders_menu));
 
   auto cart_menu = std::make_unique<cli::Menu>("cart");
-  cart_menu->Insert("checkout", [&](std::ostream&)
-      { cart_checkout(); }, "Checkout the shopping cart");
-  cart_menu->Insert("list", [&](std::ostream&)
-      { cart_show(); }, "List cart items");
-  cart_menu->Insert("edit", [&](std::ostream&, data_type::id_type id)
-      { cart_edit(id); }, "Edit cart items", {"row_id"});
-  cart_menu->Insert("remove", [&](std::ostream&, data_type::id_type id)
-      { cart_remove(id); }, "Remove an cart item", {"row_id"});
+  cart_menu->Insert(
+      "checkout", [&](std::ostream &) { cart_checkout(); },
+      "Checkout the shopping cart");
+  cart_menu->Insert(
+      "list", [&](std::ostream &) { cart_show(); }, "List cart items");
+  cart_menu->Insert(
+      "edit", [&](std::ostream &, data_type::id_type id) { cart_edit(id); },
+      "Edit cart items", {"row_id"});
+  cart_menu->Insert(
+      "remove", [&](std::ostream &, data_type::id_type id) { cart_remove(id); },
+      "Remove an cart item", {"row_id"});
   menu->Insert(std::move(cart_menu));
 
   auto wallet_menu = std::make_unique<cli::Menu>("wallet");
-  wallet_menu->Insert("balance", [&](std::ostream&)
-      { wallet_show(); }, "Show wallet balance");
-  wallet_menu->Insert("topup", [&](std::ostream&, double x)
-      { wallet_topup(x); }, "Add item to cart", {"Amount"});
+  wallet_menu->Insert(
+      "balance", [&](std::ostream &) { wallet_show(); }, "Show wallet balance");
+  wallet_menu->Insert("topup",
+                      [&](std::ostream &, double x) { wallet_topup(x); },
+                      "Add item to cart", {"Amount"});
   menu->Insert(std::move(wallet_menu));
 
   auto seller_menu = std::make_unique<cli::Menu>("seller");
-  seller_menu->Insert("list", [&](std::ostream&)
-      {seller_list();}, "List all selling items");
-  seller_menu->Insert("edit", [&](std::ostream&, data_type::id_type id)
-      {seller_edit(id);}, "Edit a selling item", {"item id"});
-  seller_menu->Insert("add", [&](std::ostream&)
-      {seller_add();}, "Add an item to sell");
-  seller_menu->Insert("remove", [&](std::ostream&, data_type::id_type id)
-      {seller_remove(id);}, "Remove a selling item", {"item id"});
-  seller_menu->Insert("sale", [&](std::ostream&)
-      {seller_sale();}, "Sale items of a specific type");
+  seller_menu->Insert(
+      "list", [&](std::ostream &) { seller_list(); }, "List all selling items");
+  seller_menu->Insert(
+      "edit", [&](std::ostream &, data_type::id_type id) { seller_edit(id); },
+      "Edit a selling item", {"item id"});
+  seller_menu->Insert(
+      "add", [&](std::ostream &) { seller_add(); }, "Add an item to sell");
+  seller_menu->Insert(
+      "remove",
+      [&](std::ostream &, data_type::id_type id) { seller_remove(id); },
+      "Remove a selling item", {"item id"});
+  seller_menu->Insert(
+      "sale", [&](std::ostream &) { seller_sale(); },
+      "Sale items of a specific type");
   menu->Insert(std::move(seller_menu));
   return menu;
 }
@@ -137,14 +149,14 @@ void client_session::signup(std::string &asd) {
       cout << "error: invalid input" << endl;
       return;
     }
-  } catch(...) {
+  } catch (...) {
     cout << "error: invalid input" << endl;
     return;
   }
-  if (!(passwd==confirm))
+  if (!(passwd == confirm))
     cout << "error: passwords don't match!" << endl;
   else {
-    request_data req(REQUEST_TYPE::SIGNUP, 0, type, 
+    request_data req(REQUEST_TYPE::SIGNUP, 0, type,
                      base_data::join({asd, passwd}));
     auto resp = feed(req);
     if (resp.success)
@@ -159,7 +171,7 @@ void client_session::login(std::string &asd) {
   getline(cin, passwd);
   request_data req(REQUEST_TYPE::LOGIN, base_data::join({asd, passwd}));
   auto resp = feed(req);
-  if(resp.success) {
+  if (resp.success) {
     cout << "logged in as " << resp.payload << " success!" << endl;
     session->Exit();
     current_user = resp.user_id;
@@ -184,8 +196,8 @@ void client_session::passwd() {
   cin >> _old;
   cout << "new password: ";
   cin >> _new;
-  request_data req(REQUEST_TYPE::PASSWD, current_user, 0, 
-      base_data::join({_old, _new}));
+  request_data req(REQUEST_TYPE::PASSWD, current_user, 0,
+                   base_data::join({_old, _new}));
   auto resp = feed(req);
 }
 
@@ -226,9 +238,9 @@ void client_session::wallet_show() {
 }
 
 void client_session::wallet_topup(double x) {
-  int64 amount = x*100;
-  request_data req(REQUEST_TYPE::WALLET_TOPUP, current_user, 
-                    0, to_string(amount));
+  int64 amount = x * 100;
+  request_data req(REQUEST_TYPE::WALLET_TOPUP, current_user, 0,
+                   to_string(amount));
   auto resp = feed(req);
 }
 
@@ -253,7 +265,7 @@ void client_session::seller_list() {
 }
 
 void client_session::seller_edit(data_type::id_type id) {
-  string name,description,price_str,type_str,stock;
+  string name, description, price_str, type_str, stock;
   double price;
   int type;
   cout << "input new name (default unchange): ";
@@ -269,14 +281,15 @@ void client_session::seller_edit(data_type::id_type id) {
   try {
     if (!price_str.empty())
       price = stod(price_str);
-  } catch(...) {
+  } catch (...) {
     cout << "error: invalid input" << endl;
     return;
   }
-  request_data req(REQUEST_TYPE::SELLER_EDIT, current_user, id
-    , base_data::join({name, description, 
-      price_str.empty() ? "" : to_string(int64(price*100)), 
-                        to_string(type), stock}));
+  request_data req(
+      REQUEST_TYPE::SELLER_EDIT, current_user, id,
+      base_data::join({name, description,
+                       price_str.empty() ? "" : to_string(int64(price * 100)),
+                       to_string(type), stock}));
   auto resp = feed(req);
 }
 
@@ -295,12 +308,13 @@ void client_session::seller_add() {
   try {
     type = stoi(type_str);
     price = stod(price_str);
-  } catch(...) {
+  } catch (...) {
     cout << "error: invalid input" << endl;
     return;
   }
-  request_data req(REQUEST_TYPE::SELLER_ADD, current_user, type
-    , base_data::join({name, description, to_string(int64(price*100))}));
+  request_data req(
+      REQUEST_TYPE::SELLER_ADD, current_user, type,
+      base_data::join({name, description, to_string(int64(price * 100))}));
   auto resp = feed(req);
 }
 
@@ -314,8 +328,8 @@ void client_session::seller_sale() {
   getline(cin, type);
   cout << "input your discount (0.8 for -20% off): " << endl;
   getline(cin, discount);
-  request_data req(REQUEST_TYPE::SELLER_SALE, current_user, 0, 
-                    base_data::join({type, discount}));
+  request_data req(REQUEST_TYPE::SELLER_SALE, current_user, 0,
+                   base_data::join({type, discount}));
   auto resp = feed(req);
 }
 
