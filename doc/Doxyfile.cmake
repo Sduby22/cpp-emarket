@@ -5,10 +5,10 @@ EXTRACT_ALL            = YES
 EXTRACT_PRIVATE        = YES
 EXTRACT_STATIC         = YES
 #---------------------------------------------------------------------------
-INPUT                  = ../include \
-                         ../src \
-                         ../src/server \
-                         ../src/client
+INPUT                  = @CMAKE_CURRENT_SOURCE_DIR@/../include \
+                         @CMAKE_CURRENT_SOURCE_DIR@/../src \
+                         @CMAKE_CURRENT_SOURCE_DIR@/../src/server \
+                         @CMAKE_CURRENT_SOURCE_DIR@/../src/client
 #---------------------------------------------------------------------------
 SOURCE_BROWSER         = YES
 INLINE_SOURCES         = YES
@@ -33,3 +33,4 @@ CALL_GRAPH             = NO
 CALLER_GRAPH           = YES
 GRAPHICAL_HIERARCHY    = YES
 DIRECTORY_GRAPH        = YES
+# DoLEANUP            = YES

@@ -14,10 +14,12 @@ include_directories(./include)
 
 include(GNUInstallDirs)
 
-option(BUILD_DOC "Build Doxygen" ON)
-find_package(Doxygen
-             REQUIRED dot
-             OPTIONAL_COMPONENTS mscgen dia)
+option(BUILD_DOC "Build Doxygen" OFF)
+find_package(
+  Doxygen
+  REQUIRED dot
+  OPTIONAL_COMPONENTS mscgen dia
+)
 
 if(BUILD_DOC AND DOXYGEN_FOUND)
   add_subdirectory(doc)

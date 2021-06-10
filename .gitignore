@@ -6,3 +6,5 @@ vscode/
 tags
 .vscode/launch.json
 .vscode/settings.json
+
+doc/html
