@@ -39,9 +39,10 @@ struct base_data {
 };
 
 struct request_data: base_data {
-  virtual ssize_t send(sockpp::stream_socket &socket) const;
-  virtual ssize_t recv(sockpp::stream_socket &socket);
-  virtual std::string dump() const;
+
+  virtual ssize_t send(sockpp::stream_socket &socket) const override;
+  virtual ssize_t recv(sockpp::stream_socket &socket) override;
+  virtual std::string dump() const override;
 
   request_data(REQUEST_TYPE type, id_type user_id, id_type target)
     : type(type), user_id(user_id), target(target)
@@ -63,13 +64,14 @@ struct request_data: base_data {
   id_type user_id;
   id_type target;
   std::string payload;
+
 };
 
 
 struct response_data: base_data {
-  virtual ssize_t send(sockpp::stream_socket &socket) const;
-  virtual ssize_t recv(sockpp::stream_socket &socket);
-  virtual std::string dump() const;
+  virtual ssize_t send(sockpp::stream_socket &socket) const override;
+  virtual ssize_t recv(sockpp::stream_socket &socket) override;
+  virtual std::string dump() const override;
 
   response_data(int success, id_type user_id, std::string msg)
     : success(success), user_id(user_id), payload(msg) {}
@@ -124,41 +126,6 @@ struct item_cart {
   size_t quantity;
 };
 
-
-/* template <typename T>
-class data_handler {
-public:
-  data_handler(const T& data): data(data) {}
-  data_handler(T&& data): data(std::move(data)) {}
-  T dump() { return std::move(data); }
-  void send();
-  void receive();
-private:
-  T data;
-};
-
-
-template<> inline void 
-data_handler<response_data>::send() {
-  
-}
-
-template<> inline void 
-data_handler<response_data>::receive() {
-  
-}
-
-template<> inline void 
-data_handler<request_data>::send() {
-  
-}
-
-template<> inline void 
-data_handler<request_data>::receive() {
-  
-} */
-
 } // namespace data
-
 
 #endif /* end of include guard: DATA_TYPE_H_WXRDIQC3 */

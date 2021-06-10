@@ -159,7 +159,7 @@ auto storage = make_storage(
     return !match.empty();
   }
 
-  string base_item::to_string() {
+  string base_item::to_string() const {
     string res;
     res += "id: " + std::to_string(item->id) + "\n";
     res += item->name + "\n";
@@ -268,7 +268,7 @@ auto storage = make_storage(
     return all_success;
   }
   
-  long long int cart::getPrice() {
+  long long int cart::getPrice() const {
     long long int price = 0;
     for (auto &item: items) {
       auto itemptr = base_item::get(item.item_id);
@@ -277,7 +277,7 @@ auto storage = make_storage(
     return price;
   }
 
-  std::string cart::getPriceStr() {
+  std::string cart::getPriceStr() const {
     string res;
     res = to_string(getPrice());
     switch (res.length()) {

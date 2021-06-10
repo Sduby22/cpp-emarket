@@ -69,10 +69,10 @@ public:
   using ITEM_TYPE = data_type::ITEM_TYPE;
   base_item(std::unique_ptr<data_type::item_data> &&ptr)
     : item(std::move(ptr)) {}
-  virtual unsigned long long int getPrice() { 
+  virtual unsigned long long int getPrice() const { 
     return static_cast<long long int>(item->price * item->discount); 
   };
-  virtual std::string getPriceStr() { 
+  virtual std::string getPriceStr() const { 
     auto pricestr = std::to_string(getPrice());
     switch (pricestr.length()) {
       case 1:
@@ -89,14 +89,14 @@ public:
   virtual ~base_item() {}
   void update();
   data_type::id_type insert();
-  std::string to_string();
+  std::string to_string() const;
   std::string get_name() const { return item->name; };
   data_type::id_type get_seller() const { return item->seller; }
   bool edit(std::vector<std::string> &vec);
   void sold(size_t amount) { item->stock -= amount; update();}
   void froze(size_t amount) { item->frozen += amount; update(); }
   void unfroze(size_t amount) { item->frozen -= amount; update(); }
-  size_t available_stock() { return item->stock - item->frozen; }
+  size_t available_stock() const { return item->stock - item->frozen; }
   void sale(double x) { item->discount = x; update(); }
   void remove();
 private:
@@ -138,8 +138,8 @@ class cart {
     data_type::id_type add(data_type::id_type item_id, size_t quantity);
     bool remove(data_type::id_type row_id) { return edit(row_id, 0); }
     bool checkout();
-    std::string getPriceStr();
-    long long int getPrice();
+    std::string getPriceStr() const;
+    long long int getPrice() const;
   private:
     data_type::id_type user;
     std::vector<data_type::item_cart> items;
