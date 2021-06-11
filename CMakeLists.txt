@@ -17,8 +17,7 @@ include(GNUInstallDirs)
 option(BUILD_DOC "Build Doxygen" OFF)
 find_package(
   Doxygen
-  REQUIRED dot
-  OPTIONAL_COMPONENTS mscgen dia
+  OPTIONAL_COMPONENTS mscgen dia dot
 )
 
 if(BUILD_DOC AND DOXYGEN_FOUND)

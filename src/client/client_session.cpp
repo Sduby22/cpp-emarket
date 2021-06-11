@@ -267,7 +267,6 @@ void client_session::seller_list() {
 void client_session::seller_edit(data_type::id_type id) {
   string name, description, price_str, type_str, stock;
   double price;
-  int type;
   cout << "input new name (default unchange): ";
   getline(cin, name);
   cout << "input new description (default unchange): ";
@@ -289,7 +288,7 @@ void client_session::seller_edit(data_type::id_type id) {
       REQUEST_TYPE::SELLER_EDIT, current_user, id,
       base_data::join({name, description,
                        price_str.empty() ? "" : to_string(int64(price * 100)),
-                       to_string(type), stock}));
+                       type_str, stock}));
   auto resp = feed(req);
 }
 
