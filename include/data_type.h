@@ -36,7 +36,7 @@ enum class REQUEST_TYPE {
 using id_type = unsigned int;
 
 /**
- * struct base_data - base_data supports send() and recv() via socket
+ * @brief base_data supports send() and recv() via socket
  */
 struct base_data {
   /**
@@ -147,7 +147,7 @@ struct response_data : base_data {
 };
 
 /**
- * struct user_data - user data type to store in Database
+ * @brief user_data - user data type to store in Database
  * 
  * @see my_user::base_user
  */
@@ -160,7 +160,7 @@ struct user_data {
 };
 
 /**
- * struct item_data - item data type to store in Database
+ * @brief item data type to store in Database
  *
  * @see my_user::base_item
  */
@@ -191,7 +191,7 @@ struct order_data {
 };
 
 /**
- * struct item_cart - cart data to store in Database
+ * @brief cart data to store in Database
  *
  * @see my_user::cart
  */

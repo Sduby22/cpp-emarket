@@ -9,6 +9,9 @@
 
 namespace my_user {
 
+/**
+ * @brief base user handler class
+ */
 class base_user {
 public:
   using USER_TYPE = data_type::USER_TYPE;
@@ -70,7 +73,7 @@ public:
   /**
    * @brief Gets the balance (unit 1$)
    *
-   * @example 10001 -> 100.01
+   * For example 10001 -> 100.01
    *
    */
   std::string get_balance() const {
@@ -102,6 +105,9 @@ private:
   std::unique_ptr<data_type::user_data> user;
 };
 
+/**
+ * @brief customer handler class
+ */
 class customer : public base_user {
 public:
   /**
@@ -114,6 +120,9 @@ public:
   virtual USER_TYPE getUserType() { return USER_TYPE::CUSTOMER; }
 };
 
+/**
+ * @brief seller handler class
+ */
 class seller : public base_user {
 public:
   seller(std::unique_ptr<data_type::user_data> &&ptr)
@@ -121,6 +130,9 @@ public:
   virtual USER_TYPE getUserType() { return USER_TYPE::SELLER; }
 };
 
+/**
+ * @brief base item handler class
+ */
 class base_item {
 public:
 
@@ -166,7 +178,7 @@ public:
   /**
    * @brief Gets human readable price. 
    *
-   * @example 1001 -> 10.01
+   * For example: 1001 -> 10.01
    *
    */
   virtual std::string getPriceStr() const {
@@ -243,18 +255,27 @@ private:
   std::unique_ptr<data_type::item_data> item;
 };
 
+/**
+ * @brief food item handler class
+ */
 class food_item : public base_item {
 public:
   food_item(std::unique_ptr<data_type::item_data> &&ptr)
       : base_item(std::move(ptr)) {}
 };
 
+/**
+ * @brief cloth item handler class
+ */
 class cloth_item : public base_item {
 public:
   cloth_item(std::unique_ptr<data_type::item_data> &&ptr)
       : base_item(std::move(ptr)) {}
 };
 
+/**
+ * @brief book item handler class
+ */
 class book_item : public base_item {
 public:
   book_item(std::unique_ptr<data_type::item_data> &&ptr)
@@ -266,6 +287,9 @@ public:
   static void db_sync();
 };
 
+/**
+ * @brief cart handler class
+ */
 class cart {
 public:
   /**
@@ -315,6 +339,9 @@ private:
   std::vector<data_type::item_cart> items;
 };
 
+/**
+ * @brief order handler class
+ */
 class order {
 public:
 
@@ -358,9 +385,8 @@ public:
    *
    */
   std::string to_string() const;
-
-private:
   std::string get_price() const;
+private:
   data_type::order_data data;
 };
 
