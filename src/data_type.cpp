@@ -85,6 +85,7 @@ std::string response_data::dump() const {
 
 std::vector<std::string> base_data::split(const std::string &s,
                                           char delimiter) {
+  if (s.empty()) return std::vector<std::string>();
   size_t pos_start = 0, pos_end, delim_len = 1;
   std::string token;
   std::vector<std::string> res;
