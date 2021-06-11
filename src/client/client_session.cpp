@@ -106,22 +106,24 @@ std::unique_ptr<cli::Menu> client_session::gen_user_menu() {
                       "Add item to cart", {"Amount"});
   menu->Insert(std::move(wallet_menu));
 
-  auto seller_menu = std::make_unique<cli::Menu>("seller");
-  seller_menu->Insert(
-      "list", [&](std::ostream &) { seller_list(); }, "List all selling items");
-  seller_menu->Insert(
-      "edit", [&](std::ostream &, data_type::id_type id) { seller_edit(id); },
-      "Edit a selling item", {"item id"});
-  seller_menu->Insert(
-      "add", [&](std::ostream &) { seller_add(); }, "Add an item to sell");
-  seller_menu->Insert(
-      "remove",
-      [&](std::ostream &, data_type::id_type id) { seller_remove(id); },
-      "Remove a selling item", {"item id"});
-  seller_menu->Insert(
-      "sale", [&](std::ostream &) { seller_sale(); },
-      "Sale items of a specific type");
-  menu->Insert(std::move(seller_menu));
+  if(user_type == data_type::USER_TYPE::SELLER) {
+    auto seller_menu = std::make_unique<cli::Menu>("seller");
+    seller_menu->Insert(
+        "list", [&](std::ostream &) { seller_list(); }, "List all selling items");
+    seller_menu->Insert(
+        "edit", [&](std::ostream &, data_type::id_type id) { seller_edit(id); },
+        "Edit a selling item", {"item id"});
+    seller_menu->Insert(
+        "add", [&](std::ostream &) { seller_add(); }, "Add an item to sell");
+    seller_menu->Insert(
+        "remove",
+        [&](std::ostream &, data_type::id_type id) { seller_remove(id); },
+        "Remove a selling item", {"item id"});
+    seller_menu->Insert(
+        "sale", [&](std::ostream &) { seller_sale(); },
+        "Sale items of a specific type");
+    menu->Insert(std::move(seller_menu));
+  }
   return menu;
 }
 
@@ -172,9 +174,11 @@ void client_session::login(std::string &asd) {
   request_data req(REQUEST_TYPE::LOGIN, base_data::join({asd, passwd}));
   auto resp = feed(req);
   if (resp.success) {
-    cout << "logged in as " << resp.payload << " success!" << endl;
+    auto vec = base_data::split(resp.payload);
+    cout << "logged in as " << vec[0] << " success!" << endl;
     session->Exit();
     current_user = resp.user_id;
+    user_type = data_type::USER_TYPE(stoi(vec[1]));
     session = std::make_unique<cli_session>(gen_user_menu());
     session->Start();
   }

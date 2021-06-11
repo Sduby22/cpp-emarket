@@ -123,7 +123,8 @@ data_type::response_data session::login(request_data &req,
     return response_data(0, "user does not exist!");
   else if (!user->checkPass(vec[1]))
     return response_data(0, "wrong password!");
-  return response_data(1, user->get_id(), vec[0]);
+  return response_data(1, user->get_id(), base_data::join({vec[0], 
+                                to_string(int(user->getUserType()))}));
 }
 
 data_type::response_data session::signup(request_data &req,

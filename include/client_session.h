@@ -107,6 +107,7 @@ private:
    * 
    */
   data_type::id_type current_user;
+  data_type::USER_TYPE user_type;
 
 /**
  * @brief server side port
