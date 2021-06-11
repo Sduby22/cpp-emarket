@@ -12,12 +12,25 @@ namespace client {
 
 class client_session;
 
+/**
+ * @brief handles user input, cli menu
+ * 
+ */
 class cli_session {
 public:
-  friend class client_session;
   cli_session(std::unique_ptr<cli::Menu> menu)
       : cli(std::move(menu)), session(cli) {}
+
+  /**
+   * @brief Start the cli session.
+   *
+   */
   void Start() { session.Start(); }
+
+  /**
+   * @brief Exit the cli session
+   *
+   */
   void Exit() { session.Exit(); }
 
 private:
@@ -25,20 +38,86 @@ private:
   cli::CliFileSession session;
 };
 
+/**
+ * @brief handles user input, C-S interaction
+ * 
+ */
 class client_session {
 
 public:
-  client_session(std::string = "localhost", unsigned = 12345);
+  /**
+   * @brief Constructor
+   *
+   * @param host Server side hostname
+   * @param port Server side port
+   */
+  client_session(std::string host = "localhost", unsigned port = 12345);
+
+  /**
+   * @brief feed the request to backend and return response_data
+   *
+   * IF network version, use socket to communicate with backend server
+   * IF client only, just call server_session::exec(req)
+   *
+   * @see server_session::session::exec
+   *
+   * @param req request data to exec
+   *
+   * @return response_data from backend server_session::exec(req)
+   */
   data_type::response_data feed(const data_type::request_data &req);
+
+  /**
+   * @brief Start the client session
+   *
+   */
   void Start() { session->Start(); }
+
+  /**
+   * @brief Return user login status
+   *
+   * @return Return true if logged in.
+   */
   bool logged_in() const { return current_user != 0; };
 
 private:
+
+/**
+ * @brief Generate main menu (login, signup, list etc)
+ * 
+ * @return std::unique_ptr<cli::Menu> Main menu ptr
+ */
   std::unique_ptr<cli::Menu> gen_main_menu();
+
+/**
+ * @brief Generate user menu (cart add, orders pay etc)
+ * 
+ * @return std::unique_ptr<cli::Menu> User menu ptr
+ */
   std::unique_ptr<cli::Menu> gen_user_menu();
+
+/**
+ * @brief handles user input 
+ * 
+ */
   std::unique_ptr<cli_session> session;
+
+  /**
+   * @brief record login status
+   * 
+   */
   data_type::id_type current_user;
+
+/**
+ * @brief server side port
+ * 
+ */
   unsigned port;
+
+  /**
+   * @brief server side hostname
+   * 
+   */
   std::string host;
 
   void logout();

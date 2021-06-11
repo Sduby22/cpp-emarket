@@ -35,19 +35,70 @@ enum class REQUEST_TYPE {
 
 using id_type = unsigned int;
 
+/**
+ * struct base_data - base_data supports send() and recv() via socket
+ */
 struct base_data {
+  /**
+   * @brief Sends data to socket
+   *
+   * @param socket socket
+   * @return bytes that successfully sent
+   */
   virtual ssize_t send(sockpp::stream_socket &socket) const = 0;
+
+  /**
+   * @brief Recv data from socket
+   *
+   * @param socket socket
+   * @return bytes that successfully received
+   */
   virtual ssize_t recv(sockpp::stream_socket &socket) = 0;
 
+  /**
+   * @brief write data to socket
+   *
+   * @tparam T data type to be written
+   * @param sock dest socket
+   * @param buf data to be sent
+   * @return bytes that successfully sent
+   */
   template <typename T>
   static ssize_t write(sockpp::stream_socket &sock, const T &buf);
 
+  /**
+   * @brief read data from socket
+   *
+   * @tparam T data type to be read
+   * @param sock src socket
+   * @param buf data to be read
+   * @return bytes that successfully read
+   */
   template <typename T>
   static ssize_t read(sockpp::stream_socket &sock, T &buf);
 
-  static std::vector<std::string> split(const std::string &str, char = 27);
+  /**
+   * @brief split string by delimiter into vector<string>
+   *
+   * @param str src string
+   * @param delim delimiter default 27 '\ESC' 
+   *
+   * @return vector<string> of splitted string
+   */
+  static std::vector<std::string> split(const std::string &str, char delim= 27);
+
+  /**
+   * @brief join a vector to string delimited by delimiter
+   *
+   * @param vec vector
+   * @param delim delimiter
+   */
   static std::string join(const std::vector<std::string> &vec, char = 27);
 
+  /**
+   * @brief dumps the data to string
+   *
+   */
   virtual std::string dump() const = 0;
 
   virtual ~base_data(){};
@@ -95,6 +146,11 @@ struct response_data : base_data {
   std::string payload;
 };
 
+/**
+ * struct user_data - user data type to store in Database
+ * 
+ * @see my_user::base_user
+ */
 struct user_data {
   id_type id;
   long long int balance; // Unit: 分
@@ -103,6 +159,11 @@ struct user_data {
   std::string passwd;
 };
 
+/**
+ * struct item_data - item data type to store in Database
+ *
+ * @see my_user::base_item
+ */
 struct item_data {
   id_type id;
   id_type seller;
@@ -115,6 +176,11 @@ struct item_data {
   std::string name;
 };
 
+/**
+ * struct order_data - order data type to store in Database
+ *
+ * @see my_user::order
+ */
 struct order_data {
   id_type id;
   id_type item_id;
@@ -124,6 +190,11 @@ struct order_data {
   unsigned long long int price;
 };
 
+/**
+ * struct item_cart - cart data to store in Database
+ *
+ * @see my_user::cart
+ */
 struct item_cart {
   id_type row_id;
   id_type item_id;
