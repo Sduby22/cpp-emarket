@@ -85,23 +85,19 @@ std::string response_data::dump() const {
 
 std::vector<std::string> base_data::split(const std::string &s,
                                           char delimiter) {
-  if (s.empty()) return std::vector<std::string>();
-  size_t pos_start = 0, pos_end, delim_len = 1;
-  std::string token;
-  std::vector<std::string> res;
-
-  while ((pos_end = s.find(delimiter, pos_start)) != std::string::npos) {
-    token = s.substr(pos_start, pos_end - pos_start);
-    pos_start = pos_end + delim_len;
-    res.push_back(token);
+  std::vector<std::string> vec;
+  auto beg = s.begin();
+  auto end = s.end();
+  auto mid = std::find(beg, end, delimiter);
+  while(mid != end) {
+    std::string str(beg, mid);
+    vec.push_back(std::move(str));
+    beg = mid + 1;
+    mid = std::find(beg, end, delimiter);
   }
-
-  auto tmp = s.substr(pos_start);
-  if (tmp.back() == 0) {
-    tmp.resize(tmp.length()-1);
-  }
-  res.push_back(std::move(tmp));
-  return res;
+  std::string str(beg, mid);
+  vec.push_back(std::move(str));
+  return vec;
 }
 
 std::string base_data::join(const std::vector<std::string> &vec,

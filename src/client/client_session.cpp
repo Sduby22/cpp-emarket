@@ -298,7 +298,7 @@ void client_session::seller_edit(data_type::id_type id) {
 
 void client_session::seller_add() {
   string name, description, price_str, type_str;
-  double price;
+  double price = 0;
   int type;
   cout << "input item name: ";
   getline(cin, name);
