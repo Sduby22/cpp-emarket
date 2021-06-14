@@ -198,7 +198,10 @@ bool base_item::edit(std::vector<std::string> &vec) {
     }
     if (!vec[4].empty()) {
       // stock
-      item->stock = std::stoi(vec[4]);
+      auto stock = std::stoi(vec[4]);
+      if (stock < item->frozen) {
+        return false;
+      }
     }
   } catch (...) {
     return false;
@@ -207,7 +210,10 @@ bool base_item::edit(std::vector<std::string> &vec) {
   return true;
 }
 
-void base_item::remove() { storage.remove<item_data>(item->id); }
+void base_item::remove() { 
+  storage.remove_all<item_cart>(where(c(&item_cart::item_id) == item->id));
+  storage.remove<item_data>(item->id); 
+}
 
 cart::cart(id_type user)
     : user(user),
