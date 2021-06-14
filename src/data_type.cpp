@@ -15,7 +15,7 @@ ssize_t base_data::write(sockpp::stream_socket &sock, const std::string &buf) {
   ssize_t tot = 0;
   unsigned int len = buf.length();
   tot += sock.write(&len, sizeof(unsigned int));
-  tot += sock.write(&buf[0], len + 1);
+  tot += sock.write(&buf[0], len);
   return tot;
 }
 
@@ -30,8 +30,8 @@ ssize_t base_data::read(sockpp::stream_socket &sock, std::string &buf) {
   ssize_t tot = 0;
   unsigned int len;
   tot += read(sock, len);
-  buf.resize(len + 1);
-  tot += sock.read(&buf[0], len + 1);
+  buf.resize(len);
+  tot += sock.read(&buf[0], len);
   return tot;
 }
 
